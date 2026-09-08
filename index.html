@@ -6,17 +6,17 @@
 <title>AI 学习引擎 · 凝练 20% · 课程化 · 可验收</title>
 <style>
   :root{
-    --c1:#534AB7; --c1-bg:#EEEDFE;   /* 核心概念：紫 */
-    --c2:#3B6D11; --c2-bg:#EAF3DE;   /* 课程计划：绿 */
-    --c3:#BA7517; --c3-bg:#FAEEDA;   /* 实战项目：橙 */
-    --c4:#185FA5; --c4-bg:#E6F1FB;   /* 检验：蓝 */
+    --c1:#534AB7; --c1-bg:#EEEDFE;
+    --c2:#3B6D11; --c2-bg:#EAF3DE;
+    --c3:#BA7517; --c3-bg:#FAEEDA;
+    --c4:#185FA5; --c4-bg:#E6F1FB;
     --ink:#1f2024; --muted:#6b6f76; --line:#e6e3db; --bg:#f6f5f1; --card:#fff;
     --ok:#0a7c2f; --err:#b3261e;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;font-size:15px;-webkit-text-size-adjust:100%}
-  .wrap{max-width:980px;margin:0 auto;padding:18px 14px 80px}
+  .wrap{max-width:1000px;margin:0 auto;padding:18px 14px 80px}
   header{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
   header h1{margin:0 0 4px;font-size:20px}
   header p{margin:0;color:var(--muted);font-size:13px}
@@ -27,8 +27,8 @@
   .tag.c2{background:var(--c2-bg);color:var(--c2)}
   .tag.c3{background:var(--c3-bg);color:var(--c3)}
   .tag.c4{background:var(--c4-bg);color:var(--c4)}
+  .badge{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11px;background:#f0eee8;color:var(--muted)}
 
-  /* 顶部输入栏 */
   .gen{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
   .gen .row{display:grid;grid-template-columns:1fr 1fr 130px;gap:10px;margin-bottom:10px}
   @media(max-width:680px){.gen .row{grid-template-columns:1fr 1fr}}
@@ -50,21 +50,32 @@
   .status .err details{margin-top:6px;padding:8px 10px;background:#fff5f5;border:1px solid #f3d4d1;border-radius:8px}
   .status .err summary{cursor:pointer;color:var(--err);font-weight:600}
 
-  /* 结果区 */
   .hero{padding:18px 20px}
   .hero h2{font-size:22px;margin:0 0 4px}
   .hero .oneliner{margin:0;color:var(--muted);font-size:14px}
   .meta-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 
-  /* 核心概念 */
-  .concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
-  .concept{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
-  .concept .name{font-weight:600;font-size:15px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .concept .name .pct{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--c1-bg);color:var(--c1);font-weight:700}
-  .concept .why{margin:0 0 6px;color:#444;font-size:13.5px}
-  .concept .pitfall{margin:0;color:var(--err);font-size:12.5px}
+  /* 核心概念：可点击展开 */
+  .concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+  .concept{border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;transition:border-color .15s}
+  .concept:hover{border-color:var(--c1)}
+  .concept.open{border-color:var(--c1);box-shadow:0 0 0 2px var(--c1-bg)}
+  .concept .head{padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .concept .name{font-weight:600;font-size:15px}
+  .concept .pct{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--c1-bg);color:var(--c1);font-weight:700;white-space:nowrap}
+  .concept .summary{color:#444;font-size:13px;padding:0 14px 10px}
+  .concept .body{display:none;padding:0 14px 12px;border-top:1px dashed var(--line);margin-top:6px;padding-top:10px}
+  .concept.open .body{display:block}
+  .concept .body h4{margin:8px 0 4px;font-size:12px;color:var(--c1);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .concept .body h4:first-child{margin-top:0}
+  .concept .body p{margin:0 0 6px;font-size:13.5px;color:#333}
+  .concept .body pre{background:#faf8f3;border:1px solid var(--line);border-radius:6px;padding:6px 9px;margin:4px 0;font-size:12.5px;overflow-x:auto;white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .concept .body ul{margin:4px 0;padding-left:20px;font-size:13px}
+  .concept .body li{margin-bottom:2px}
+  .concept .body .pitfall{color:var(--err);font-size:13px}
+  .concept .toggle-hint{color:var(--muted);font-size:11px;margin-left:6px}
 
-  /* 课程 */
+  /* 课程：每节可展开 */
   .lessons{display:flex;flex-direction:column;gap:10px}
   .lesson{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
   .lesson summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -72,13 +83,31 @@
   .lesson summary::before{content:"▸";color:var(--c2);transition:transform .15s;display:inline-block;width:14px}
   .lesson[open] summary::before{transform:rotate(90deg)}
   .lesson summary .badge{margin-left:auto;background:var(--c2-bg);color:var(--c2);font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600}
-  .lesson-body{padding:0 14px 14px;display:grid;gap:8px}
+  .lesson-body{padding:0 14px 14px;display:grid;gap:10px}
   .lesson-body .row{font-size:13.5px}
-  .lesson-body .row b{color:var(--c2);display:block;margin-bottom:2px;font-size:12px;font-weight:600}
+  .lesson-body .row b{color:var(--c2);display:block;margin-bottom:3px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .lesson-body .goal{background:var(--c2-bg);border-radius:8px;padding:8px 12px;font-size:13.5px}
   .lesson-body ul{margin:0;padding-left:20px}
-  .lesson-body li{margin-bottom:3px}
-  .res{display:inline-block;background:#f6f5f1;border:1px solid var(--line);border-radius:8px;padding:3px 9px;margin:2px 4px 2px 0;font-size:12.5px}
-  .res .t{color:var(--muted);font-size:11px;margin-right:4px}
+  .lesson-body li{margin-bottom:4px}
+
+  /* 资源：可点击 */
+  .res{display:flex;align-items:center;gap:6px;background:#f6f5f1;border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:3px 0;font-size:13px;text-decoration:none;color:var(--ink);transition:border-color .15s}
+  .res:hover{border-color:var(--c4);background:#fff}
+  .res .t{color:var(--c4);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;min-width:30px}
+  .res .n{flex:1}
+  .res .note{color:var(--muted);font-size:11.5px;display:block;margin-top:1px}
+  .res .arrow{color:var(--c4);font-size:12px}
+
+  /* 题目卡：可揭示答案 */
+  .qa{border:1px solid var(--line);border-radius:8px;background:#fcfbf7;padding:8px 12px;margin:4px 0}
+  .qa .q{font-size:13.5px;font-weight:500;display:flex;gap:6px}
+  .qa .q::before{content:"Q";color:var(--c2);font-weight:700;flex-shrink:0}
+  .qa .reveal{font-size:11.5px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 8px;cursor:pointer;color:var(--muted);margin:6px 0 0 22px;display:inline-block}
+  .qa .reveal:hover{color:var(--c2);border-color:var(--c2)}
+  .qa .a{display:none;margin:6px 0 0 22px;padding:8px 10px;background:#fff;border-left:3px solid var(--c2);border-radius:0 6px 6px 0;font-size:13px;white-space:pre-wrap}
+  .qa.revealed .a{display:block}
+  .qa.revealed .reveal{color:var(--c2);border-color:var(--c2)}
+  .qa .a::before{content:"A · ";color:var(--c2);font-weight:700}
 
   /* 实战项目 */
   .project{border:1px solid var(--c3);border-radius:12px;background:#fff;padding:14px 16px;margin-bottom:10px}
@@ -94,19 +123,21 @@
   .checks h4{margin:0 0 6px;font-size:13px;color:var(--c3)}
   .checks label{display:flex;gap:6px;align-items:start;padding:3px 0;font-size:13.5px;cursor:pointer}
 
-  /* 检验 */
-  .review-list{font-size:13.5px}
-  .review-list li{margin-bottom:4px}
+  /* 实战项目的可执行任务（题目/项目/作品） */
+  .practical{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  .prac{border:1px solid var(--c3);border-radius:8px;background:#fff8eb;padding:8px 12px;cursor:pointer}
+  .prac .ptitle{font-weight:600;font-size:13.5px;color:var(--c3);display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .prac .ptitle .kind{font-size:10px;background:var(--c3);color:#fff;padding:1px 6px;border-radius:4px}
+  .prac .pspec{font-size:12.5px;color:#444;margin:4px 0 0;white-space:pre-wrap}
+  .prac .pexp{display:none;margin-top:6px;padding:8px 10px;background:#fff;border-left:3px solid var(--c3);border-radius:0 6px 6px 0;font-size:12.5px;white-space:pre-wrap}
+  .prac.open .pexp{display:block}
+  .prac .reveal{font-size:11px;color:var(--c3);background:transparent;border:0;cursor:pointer;padding:0 4px}
 
   /* 历史 */
   .hist{display:flex;flex-wrap:wrap;gap:6px}
-  .hist-item{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .hist-item{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12.5px;cursor:pointer}
   .hist-item:hover{border-color:var(--c1)}
-  .hist-item .star{color:#d4a72c}
-  .hist-item .x{color:var(--muted);margin-left:2px}
-  .hist-item .x:hover{color:var(--err)}
 
-  /* 设置面板 */
   details.set{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px 14px;margin-top:10px}
   details.set>summary{list-style:none;cursor:pointer;font-weight:600;font-size:14px}
   details.set>summary::-webkit-details-marker{display:none}
@@ -114,19 +145,22 @@
   .set-body{margin-top:10px;display:grid;gap:8px}
   .set-row{display:grid;grid-template-columns:130px 1fr;gap:8px;align-items:center;font-size:13px}
   .set-row input,.set-row select{font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:8px;width:100%;background:#fff}
+  .recommend{background:#fff8eb;border:1px solid #f0d9a5;border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.6;margin-top:6px}
+  .recommend b{color:var(--c3)}
 
-  /* 工具类 */
   .hidden{display:none!important}
   .empty{text-align:center;color:var(--muted);padding:30px 16px;font-size:14px}
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--c1);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
-  details>summary{cursor:pointer}
   .row-act{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
   .copy-btn{font-size:12px;padding:4px 8px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;color:var(--muted)}
   .copy-btn:hover{color:var(--ink);border-color:var(--ink)}
+
   @media print{
     body{background:#fff}
-    .gen,.row-act,.hist details.set{display:none!important}
+    .gen,.row-act,.hist details.set,.qa .reveal,.prac,.concept .body{display:none!important}
+    .concept.open .body{display:block!important}
+    .qa .a,.prac .pexp{display:block!important}
     .card{break-inside:avoid;border:1px solid #ddd;box-shadow:none}
   }
 </style>
@@ -136,14 +170,13 @@
 
 <header>
   <h1>AI 学习引擎 <span style="color:var(--muted);font-weight:400;font-size:13px">· 凝练 20% · 课程化 · 可验收</span></h1>
-  <p>输入一个领域，AI 凝练其最核心的 20% 概念与技能、拆成几次可执行课、附一个能证明「真的会用」的实战小项目。</p>
+  <p>输入一个领域，AI 凝练其最核心 20%、拆成可执行课、附可验收实战项目（含真实题目/答案/资源链接）。</p>
 </header>
 
-<!-- 输入区 -->
 <div class="gen">
   <div class="row">
     <input id="domain" placeholder="学习领域（必填），如：初二数学 / 雅思口语 / Python 入门">
-    <input id="goal" placeholder="目标/用途（可选），如：3 个月内能考到 6.5 分">
+    <input id="goal" placeholder="目标/用途（可选），如：3 个月能考到 6.5 分">
     <select id="level">
       <option value="零基础">零基础</option>
       <option value="入门">入门</option>
@@ -164,18 +197,20 @@
       <div class="set-row">
         <label>服务商</label>
         <select id="provider">
-          <option value="zhipu">智谱 GLM（推荐·国内免费层）</option>
-          <option value="deepseek">DeepSeek（强推理·便宜）</option>
-          <option value="qwen">通义千问（阿里·免费层）</option>
+          <option value="zhipu-plus">智谱 GLM-4-Plus ⭐推荐（中文最强指令遵循）</option>
+          <option value="deepseek-v3">DeepSeek-V3 ⭐推荐（质量/价格最佳）</option>
+          <option value="qwen-max">通义 Qwen3-Max（最新·综合强）</option>
+          <option value="qwen-plus">通义 Qwen-Plus（便宜·够用）</option>
           <option value="moonshot">月之暗面 Kimi</option>
-          <option value="siliconflow">硅基流动（白嫖多家）</option>
-          <option value="openai">OpenAI（国内需代理）</option>
+          <option value="siliconflow">硅基流动（白嫖 DeepSeek-V3）</option>
+          <option value="zhipu-flash">智谱 GLM-4-Flash（免费·质量差·仅应急）</option>
+          <option value="openai">OpenAI GPT-4o（国内需代理）</option>
           <option value="custom">自定义</option>
         </select>
       </div>
-      <div class="set-row"><label>API Base URL</label><input id="base" placeholder="如：https://api.deepseek.com/v1"></div>
-      <div class="set-row"><label>API Key</label><input id="key" type="password" placeholder="sk-…（仅本机浏览器保存）"></div>
-      <div class="set-row"><label>模型名</label><input id="model" placeholder="如：glm-4-flash / deepseek-chat / qwen-plus"></div>
+      <div class="set-row"><label>API Base URL</label><input id="base" placeholder="自动填"></div>
+      <div class="set-row"><label>API Key</label><input id="key" type="password" placeholder="sk-… / GLM Key（仅本机保存）"></div>
+      <div class="set-row"><label>模型名</label><input id="model" placeholder="自动填"></div>
       <div class="set-row">
         <label>中转模式</label>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -184,6 +219,14 @@
           <input id="relayToken" type="password" placeholder="口令（可选）" style="max-width:120px">
         </div>
       </div>
+      <div class="recommend">
+        <b>💡 内容质量 = 模型能力</b><br>
+        你之前用 <code>glm-4-flash</code>（免费档），所以内容泛泛。换成下面任一档，质量立竿见影：<br>
+        • <b>DeepSeek-V3</b>：充 1 元能用几个月，0.27 元/百万 token（输入）<br>
+        • <b>智谱 GLM-4-Plus</b>：0.05 元/千 token，指令遵循最好<br>
+        • <b>Qwen3-Max</b>：0.02 元/千 token（输入），综合强<br>
+        同一个服务商只需换「模型名」，Key 不变。
+      </div>
       <div class="set-row" style="text-align:right">
         <label></label>
         <div style="display:flex;gap:8px">
@@ -191,17 +234,12 @@
           <button class="btn secondary" id="clearSet">清除</button>
         </div>
       </div>
-      <div style="font-size:12px;color:var(--muted)">
-        <b>第一次用：</b>1) 选服务商 · 2) 注册该平台拿 Key · 3) 粘到 API Key · 4) 回到主页点「生成」。或启用「中转模式」让别人共享的 Key 替你跑（Key 不出现在浏览器）。
-      </div>
     </div>
   </details>
 </div>
 
-<!-- 结果区 -->
 <div id="result"></div>
 
-<!-- 历史 -->
 <div class="card" id="histCard" style="display:none">
   <h2>📚 历史计划</h2>
   <div class="hist" id="hist"></div>
@@ -214,25 +252,29 @@
 <script>
 "use strict";
 
-/* ===== 1. 预设 ===== */
+/* ===== 1. 预设（已根据 2026 行情重排推荐顺序） ===== */
 const PRESETS={
-  zhipu:{base:"https://open.bigmodel.cn/api/paas/v4", model:"glm-4-flash"},
-  deepseek:{base:"https://api.deepseek.com/v1", model:"deepseek-chat"},
-  qwen:{base:"https://dashscope.aliyuncs.com/compatible-mode/v1", model:"qwen-plus"},
-  moonshot:{base:"https://api.moonshot.cn/v1", model:"moonshot-v1-8k"},
-  siliconflow:{base:"https://api.siliconflow.cn/v1", model:"Qwen/Qwen2.5-72B-Instruct"},
-  openai:{base:"https://api.openai.com/v1", model:"gpt-4o-mini"},
-  custom:{base:"", model:""}
+  "zhipu-plus":  {base:"https://open.bigmodel.cn/api/paas/v4", model:"glm-4-plus", note:"智谱主力·指令遵循强"},
+  "deepseek-v3": {base:"https://api.deepseek.com/v1",          model:"deepseek-chat", note:"性价比之王"},
+  "qwen-max":    {base:"https://dashscope.aliyuncs.com/compatible-mode/v1", model:"qwen3-max", note:"通义最新旗舰"},
+  "qwen-plus":   {base:"https://dashscope.aliyuncs.com/compatible-mode/v1", model:"qwen-plus", note:"通义主流·够用"},
+  "moonshot":    {base:"https://api.moonshot.cn/v1",            model:"moonshot-v1-8k", note:"Kimi"},
+  "siliconflow": {base:"https://api.siliconflow.cn/v1",         model:"deepseek-ai/DeepSeek-V3", note:"白嫖多家"},
+  "zhipu-flash": {base:"https://open.bigmodel.cn/api/paas/v4",   model:"glm-4-flash", note:"免费·质量差"},
+  "openai":      {base:"https://api.openai.com/v1",              model:"gpt-4o-mini", note:"国内需代理"},
+  "custom":      {base:"", model:""}
 };
 const RELAY_CFG = (typeof window.APP_RELAY==="object" && window.APP_RELAY) ? window.APP_RELAY : {};
 const DEFAULT_RELAY = RELAY_CFG.url || "";
 const DEFAULT_RELAY_TOKEN = RELAY_CFG.token || "";
 
-/* ===== 2. 设置持久化 ===== */
+/* ===== 2. 设置 ===== */
 function loadSettings(){
-  const raw=localStorage.getItem("aiLearn.v2.settings");
+  const raw=localStorage.getItem("aiLearn.v3.settings");
   if(!raw){
-    $("#provider").value="zhipu"; applyPreset();
+    const def = RELAY_CFG.recommendedProvider || "zhipu-plus";
+    $("#provider").value=PRESETS[def]?def:"zhipu-plus";
+    applyPreset();
     if(DEFAULT_RELAY){
       $("#relayOn").checked=true;
       $("#relayUrl").value=DEFAULT_RELAY;
@@ -252,92 +294,91 @@ function loadSettings(){
   }catch(e){}
 }
 function saveSettings(){
-  const s={
-    provider:$("#provider").value,
-    base:$("#base").value.trim(),
-    key:$("#key").value.trim(),
-    model:$("#model").value.trim(),
-    relayOn:$("#relayOn").checked,
-    relayUrl:$("#relayUrl").value.trim(),
-    relayToken:$("#relayToken").value.trim()
-  };
-  localStorage.setItem("aiLearn.v2.settings", JSON.stringify(s));
-  flash("ok","设置已保存");
+  const s={provider:$("#provider").value, base:$("#base").value.trim(), key:$("#key").value.trim(),
+           model:$("#model").value.trim(), relayOn:$("#relayOn").checked, relayUrl:$("#relayUrl").value.trim(), relayToken:$("#relayToken").value.trim()};
+  localStorage.setItem("aiLearn.v3.settings", JSON.stringify(s));
+  flash("ok","✓ 设置已保存");
 }
 function getSettings(){
-  return {
-    provider:$("#provider").value,
-    base:$("#base").value.trim(),
-    key:$("#key").value.trim(),
-    model:$("#model").value.trim(),
-    relayOn:$("#relayOn").checked,
-    relayUrl:$("#relayUrl").value.trim(),
-    relayToken:$("#relayToken").value.trim()
-  };
+  return {provider:$("#provider").value, base:$("#base").value.trim(), key:$("#key").value.trim(),
+          model:$("#model").value.trim(), relayOn:$("#relayOn").checked, relayUrl:$("#relayUrl").value.trim(), relayToken:$("#relayToken").value.trim()};
 }
 function applyPreset(){
-  const p=$("#provider").value;
-  const v=PRESETS[p]||PRESETS.custom;
-  $("#base").value=v.base;
-  $("#model").value=v.model;
+  const v=PRESETS[$("#provider").value]||PRESETS.custom;
+  $("#base").value=v.base; $("#model").value=v.model;
 }
 function $(s){return document.querySelector(s)}
 
-/* ===== 3. 提示词：单一生成，返回 3 大段 ===== */
-const SYS = `你是一位顶级的学习设计师，擅长把任何领域凝练为「20% 核心 + 几次课 + 一个能证明会用的实战项目」。
+/* ===== 3. 提示词：极严，强制具体内容 ===== */
+const SYS = `你是顶级学习设计师+领域专家，擅长把任何领域凝练为「20% 核心 + 几次课 + 一个能证明会用的实战项目」。
 
-严格要求：
-1. 所有书/课/网站必须给具体名称（人教版/可汗学院/B 站关键词/Anki 卡组等），禁止"相关教材""网上资料"等空话。
-2. 练习必须是可数可执行的具体动作（"做 10 道" "30 分钟" "找一个朋友讲 3 分钟"），不是"多做练习"。
-3. 复习题是问答题或操作题，不是"理解本章"。
-4. 实战项目的 milestone 必须按"第 X 天：具体任务 + 验收标准"格式，每条都能在当天被检查是否完成。
-5. 输出的 20% 核心概念数量 = 6~8 个，weight 是占比（加起来=100），按重要性从高到低排。
-6. 课的数量 = 5~7 节，按依赖顺序排，每节聚焦 1~3 个核心概念。
-7. 直接返回 JSON，禁止 markdown 代码块，禁止任何解释文字。`;
+【输出质量铁律——违反任何一条都算不合格】
+1. **禁止空词**：禁止出现"理解/掌握/了解/熟悉/认识"等不能验证的词；必须用可观察可测量的动作（"能解出"、"能做 5 道"、"能向朋友讲清 3 分钟"）。
+2. **每个核心概念必须包含**：name, weight(占比), summary(30字内), detail(100-150字：定义+为什么重要+学完能做什么), example(具体例子/公式/代码片段), keyPoints(3 条要点), pitfall(最易错点)。
+3. **每个练习/复习题必须包含完整 Q&A**：q(题目/任务)+ a(标准答案或完成判定标准)，禁止只给"做 5 道题"这种空壳。
+4. **每个资源必须可点击**：name + url(URL 或搜索关键词) + note(推荐理由)；url 若不确定就给"site:bilibili.com 关键词"这种可搜索的形式。
+5. **实战项目必须真材实料**：除 milestones 外必须有 practical 数组，至少 3 个可执行任务（数学：真实题目+答案；编程：项目需求+代码框架或预期输出；语言：朗读材料+自评标准；其他：可交付物+验收）。
+6. **数据真实可信**：书名给出版本（如"人教版八年级上册 2024 版"），视频给具体课程名或频道名，工具给具体 APP 名+平台。
+7. **直接返回 JSON**，禁止 markdown 代码块，禁止任何解释文字，禁止截断。`;
 
-/* 用户提示词（更具体） */
 const USER_PROMPT = d=>`领域：${d.domain}
-目标：${d.goal || "（用户未填，默认：能用、能讲清）"}
+目标：${d.goal || "能用、能讲清"}
 水平：${d.level}
 
-请按以下 JSON 格式输出（不要任何多余文字）：
+请严格按以下 JSON 输出（不要任何多余文字、代码块、解释）：
 
 {
   "title": "领域名",
-  "oneLiner": "一句话定位这个领域是什么、学到什么程度算入门（30 字内）",
+  "oneLiner": "30 字内定位这个领域是什么、学到什么程度算入门",
   "core20": [
-    {"name":"概念名","weight": 15, "why":"为什么是核心（30 字内）","pitfall":"最易错/最常误解点（20 字内）"},
-    …6~8 个，按重要性降序，weight 之和 = 100
+    {
+      "name": "概念名",
+      "weight": 20,
+      "summary": "30 字内简介",
+      "detail": "100-150 字深入解释（定义+为什么核心+学完能做什么具体的事）",
+      "example": "1-2 个具体例子（数学用公式/题目，编程用代码片段，其他用具体案例）",
+      "keyPoints": ["要点 1", "要点 2", "要点 3"],
+      "pitfall": "最易错/最常误解点（20 字内）"
+    }
+    // 6-8 个，按重要性降序，weight 之和 = 100
   ],
   "lessons": [
     {
       "n": 1,
       "title": "第1课:xxx",
-      "goal": "学完能…（用动作描述）",
+      "goal": "学完能...(用可观察动作+完成标准)",
       "concepts": ["涉及的核心概念名"],
-      "exercises": ["具体练习1（含数量/时长）","具体练习2","具体练习3"],
-      "resources": [
-        {"type":"教材","name":"具体书名/版本"},
-        {"type":"视频","name":"具体课程名或搜索词"},
-        {"type":"工具","name":"具体 APP/网站"}
+      "exercises": [
+        {"q": "具体题目或任务", "a": "标准答案或完成判定标准"},
+        {"q": "...", "a": "..."}
       ],
-      "review": ["问答题或操作题1","问答题或操作题2"]
-    },
-    …5~7 节
+      "resources": [
+        {"type": "教材/视频/工具/网站", "name": "具体名+版本", "url": "URL 或可搜索的关键词", "note": "一句话推荐理由"}
+      ],
+      "review": [
+        {"q": "问答题或操作题", "a": "参考答案或操作步骤"},
+        {"q": "...", "a": "..."}
+      ]
+    }
+    // 5-7 节，按依赖顺序
   ],
   "capstone": {
     "title": "可验收实战项目名",
     "duration": "X天",
-    "deliverable": "最终可交付物（具体形式）",
+    "deliverable": "最终可交付物（具体形式+格式）",
     "milestones": [
-      {"day": 3, "task": "具体任务", "check": "如何验收这一天"},
-      …5~8 个 milestones，day 递增
+      {"day": 3, "task": "具体任务", "check": "如何验收这一天"}
+      // 5-8 个
     ],
-    "finalCheck": ["最终验收标准1（可观察/可测量）","最终验收标准2","最终验收标准3"]
+    "finalCheck": ["可观察的最终验收标准 1", "可观察的验收标准 2", "可观察的验收标准 3"],
+    "practical": [
+      {"kind": "题目/项目/作品/任务", "title": "具体标题", "spec": "详细要求（输入/输出/标准）", "expected": "预期产出/答案/完成标志"}
+      // 至少 3 个
+    ]
   }
 }`;
 
-/* ===== 4. JSON 解析（含自动修复） ===== */
+/* ===== 4. JSON 修复 ===== */
 function repairTruncatedJSON(s){
   let inStr=false, esc=false;
   const stack=[];
@@ -369,59 +410,49 @@ function parseJSON(txt){
   throw new Error("模型返回的不是合法 JSON。原始内容（前 200 字）："+t.slice(0,200));
 }
 
-/* ===== 5. API 调用（带 1 次重试） ===== */
+/* ===== 5. API 调用（带 1 次重试 + max_tokens=6000） ===== */
 async function callAI(userPrompt){
   const s=getSettings();
-  if(s.relayOn && s.relayUrl){
-    return await callRelayWithRetry(userPrompt, s);
-  }
-  if(!s.base||!s.key||!s.model) throw new Error("请先在 ⚙ 设置 中填写 API Key、Base URL 和模型名，或启用「中转模式」。");
-  return await callDirectWithRetry(userPrompt, s);
+  if(s.relayOn && s.relayUrl) return await callOnce(userPrompt, s, true);
+  if(!s.base||!s.key||!s.model) throw new Error("请先在 ⚙ 设置 中填 API Key、Base URL 和模型名，或启用「中转模式」。");
+  return await callOnce(userPrompt, s, false);
 }
-async function callDirectWithRetry(userPrompt, s){
-  const target=s.base.replace(/\/$/,"")+"/chat/completions";
-  const url = s.proxyOn ? (s.proxyUrl.replace(/\/$/,"")+"/?url="+encodeURIComponent(target)) : target;
+async function callOnce(userPrompt, s, isRelay){
+  let lastErr;
   for(let attempt=0; attempt<2; attempt++){
-    const body={model:s.model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.6};
-    if(attempt===1) body.messages[1].content += "\n\n【重申】只返回完整 JSON，禁止任何解释文字，禁止代码块围栏，禁止截断！";
-    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.key},body:JSON.stringify(body)});
-    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error("API "+res.status+"："+t.slice(0,180)); }
+    const body={model:s.model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.6, max_tokens:6000};
+    if(attempt===1) body.messages[1].content += "\n\n【重申】只返回完整 JSON，禁止代码块围栏、禁止解释、禁止截断！所有 detail 不少于 100 字，所有 q 必须配 a。";
+    if(isRelay){
+      body.provider = s.provider;
+      if(s.relayToken) body.token=s.relayToken;
+      var res=await fetch(s.relayUrl.replace(/\/$/,""),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    }else{
+      const target=s.base.replace(/\/$/,"")+"/chat/completions";
+      res=await fetch(target,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.key},body:JSON.stringify(body)});
+    }
+    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error((isRelay?"中转 ":"API ")+res.status+"："+t.slice(0,180)); }
     const j=await res.json();
     const txt=j.choices?.[0]?.message?.content;
-    if(!txt) throw new Error("API 未返回内容");
+    if(!txt) throw new Error((isRelay?"中转":"API")+" 未返回内容");
     try{ return parseJSON(txt); }
-    catch(e){
-      if(attempt===0){ console.warn("JSON parse fail, retrying...", e.message); continue; }
-      throw e;
-    }
+    catch(e){ lastErr=e; console.warn("JSON parse fail, retrying", e.message); }
   }
-}
-async function callRelayWithRetry(userPrompt, s){
-  for(let attempt=0; attempt<2; attempt++){
-    const body={provider:s.provider, model:s.model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.6};
-    if(attempt===1) body.messages[1].content += "\n\n【重申】只返回完整 JSON，禁止任何解释文字，禁止代码块围栏，禁止截断！";
-    if(s.relayToken) body.token=s.relayToken;
-    const res=await fetch(s.relayUrl.replace(/\/$/,""),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error("中转 "+res.status+"："+t.slice(0,180)); }
-    const j=await res.json();
-    const txt=j.choices?.[0]?.message?.content;
-    if(!txt) throw new Error("中转未返回内容");
-    try{ return parseJSON(txt); }
-    catch(e){
-      if(attempt===0){ console.warn("JSON parse fail, retrying via relay...", e.message); continue; }
-      throw e;
-    }
-  }
+  throw lastErr;
 }
 
-/* ===== 6. 渲染 ===== */
+/* ===== 6. 工具 ===== */
 function esc(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]); }
+function openableUrl(u){
+  if(!u) return null;
+  if(/^https?:\/\//i.test(u)) return u;
+  // 搜索关键词形式：直接在 bilibili/google 搜
+  return "https://www.bing.com/search?q="+encodeURIComponent(u);
+}
 
+/* ===== 7. 渲染 ===== */
 function renderPlan(data){
-  const r=$("#result");
-  r.innerHTML="";
+  const r=$("#result"); r.innerHTML="";
 
-  // hero
   const hero=document.createElement("div");
   hero.className="card hero";
   hero.innerHTML=`
@@ -431,134 +462,175 @@ function renderPlan(data){
       <span class="tag c1">核心 ${data.core20?.length||0} 个</span>
       <span class="tag c2">课程 ${data.lessons?.length||0} 节</span>
       <span class="tag c3">项目 ${esc(data.capstone?.duration||"X")}天</span>
+      <span class="badge">点击概念可展开详情</span>
     </div>
     <div class="row-act">
       <button class="copy-btn" id="copyMd">📋 复制为 Markdown</button>
-    </div>
-  `;
+    </div>`;
   r.appendChild(hero);
 
   // 1) 核心 20%
   const c1=document.createElement("div");
   c1.className="card";
-  c1.innerHTML=`<h2><span class="tag c1">20% 核心</span> 必须掌握的概念与技能</h2>
+  c1.innerHTML=`<h2><span class="tag c1">20% 核心</span> 必须掌握的概念与技能 <span class="badge">点击展开详细解释/例子/要点</span></h2>
     <p style="margin:0 0 10px;color:var(--muted);font-size:13px">按重要性排序；掌握前 5 个就入门，掌握全部 7~8 个就超越多数自学者的水平。</p>
-    <div class="concepts">${(data.core20||[]).map(c=>`
-      <div class="concept">
-        <div class="name"><span>${esc(c.name||"")}</span><span class="pct">${c.weight||0}%</span></div>
-        <p class="why">${esc(c.why||"")}</p>
-        <p class="pitfall">⚠ ${esc(c.pitfall||"")}</p>
+    <div class="concepts">${(data.core20||[]).map((c,i)=>`
+      <div class="concept" data-i="${i}">
+        <div class="head">
+          <div class="name">${esc(c.name||"")} <span class="toggle-hint">▸ 点击展开</span></div>
+          <div class="pct">${c.weight||0}%</div>
+        </div>
+        <div class="summary">${esc(c.summary||"")}</div>
+        <div class="body">
+          <h4>📖 详细解释</h4>
+          <p>${esc(c.detail||"")}</p>
+          ${c.example ? `<h4>💡 例子</h4><pre>${esc(c.example)}</pre>` : ""}
+          ${(c.keyPoints&&c.keyPoints.length) ? `<h4>🔑 要点</h4><ul>${c.keyPoints.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+          <h4>⚠ 易错点</h4><p class="pitfall">${esc(c.pitfall||"")}</p>
+        </div>
       </div>`).join("")}</div>`;
   r.appendChild(c1);
+  // 概念点击展开
+  c1.querySelectorAll(".concept").forEach(el=>{
+    el.addEventListener("click", e=>{
+      e.stopPropagation();
+      el.classList.toggle("open");
+      const hint=el.querySelector(".toggle-hint");
+      hint.textContent = el.classList.contains("open") ? "▾ 点击收起" : "▸ 点击展开";
+    });
+  });
 
   // 2) 课程计划
   const c2=document.createElement("div");
   c2.className="card";
-  c2.innerHTML=`<h2><span class="tag c2">课程计划</span> 5~7 节，从入门到能做项目</h2>
+  c2.innerHTML=`<h2><span class="tag c2">课程计划</span> 5~7 节，从入门到能做项目 <span class="badge">展开查看题目与答案</span></h2>
     <div class="lessons">${(data.lessons||[]).map(L=>`
       <details class="lesson" ${L.n===1?"open":""}>
-        <summary>${esc(L.title||"第"+L.n+"课")} <span class="badge">${(L.concepts||[]).length} 概念</span></summary>
+        <summary>${esc(L.title||"第"+L.n+"课")} <span class="badge">${(L.exercises||[]).length} 练 · ${(L.review||[]).length} 复习</span></summary>
         <div class="lesson-body">
-          <div class="row"><b>学习目标</b>${esc(L.goal||"")}</div>
-          <div class="row"><b>涉及概念</b>${(L.concepts||[]).map(x=>`<span class="res">${esc(x)}</span>`).join("")}</div>
-          <div class="row"><b>练习内容</b><ul>${(L.exercises||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
-          <div class="row"><b>参考资源</b>${(L.resources||[]).map(x=>`<span class="res"><span class="t">${esc(x.type||"")}</span>${esc(x.name||"")}</span>`).join("")||'<span style="color:var(--muted)">无</span>'}</div>
-          <div class="row"><b>复习题</b><ul class="review-list">${(L.review||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+          <div class="row goal"><b>🎯 学习目标</b>${esc(L.goal||"")}</div>
+          <div class="row"><b>📌 涉及概念</b>${(L.concepts||[]).map(x=>`<span class="res"><span class="t">概念</span><span class="n">${esc(x)}</span></span>`).join("")}</div>
+          <div class="row"><b>✏️ 练习（点开看答案）</b>${(L.exercises||[]).map(q=>`
+            <div class="qa"><div class="q">${esc(q.q||"")}</div><button class="reveal">显示答案</button><div class="a">${esc(q.a||"")}</div></div>`).join("")}</div>
+          <div class="row"><b>📚 参考资源（点击跳转）</b>${(L.resources||[]).map(r=>{
+            const u=openableUrl(r.url||r.name);
+            return `<a class="res" href="${esc(u)}" target="_blank" rel="noopener">
+              <span class="t">${esc(r.type||"资源")}</span>
+              <span class="n">${esc(r.name||"")}${r.note?`<span class="note">${esc(r.note)}</span>`:""}</span>
+              <span class="arrow">↗</span>
+            </a>`;
+          }).join("")}</div>
+          <div class="row"><b>🧠 复习题（点开看参考答案）</b>${(L.review||[]).map(q=>`
+            <div class="qa"><div class="q">${esc(q.q||"")}</div><button class="reveal">显示答案</button><div class="a">${esc(q.a||"")}</div></div>`).join("")}</div>
         </div>
       </details>`).join("")}</div>`;
   r.appendChild(c2);
+  // 答案揭示
+  c2.querySelectorAll(".qa").forEach(qa=>{
+    qa.querySelector(".reveal").addEventListener("click", e=>{ e.stopPropagation(); qa.classList.toggle("revealed"); qa.querySelector(".reveal").textContent = qa.classList.contains("revealed") ? "隐藏答案" : "显示答案"; });
+  });
+  // 防止点击 details 内部时收拢
+  c2.querySelectorAll(".qa, .res").forEach(el=>el.addEventListener("click", e=>e.stopPropagation()));
 
   // 3) 实战项目
   if(data.capstone){
     const P=data.capstone;
     const c3=document.createElement("div");
     c3.className="card";
-    const msHTML=(P.milestones||[]).map(m=>`
-      <label class="ms">
-        <input type="checkbox" data-domain="${esc(data.title)}" data-day="${m.day}" data-task="${esc(m.task)}">
-        <div>
-          <div class="t">${esc(m.task||"")}</div>
-          <span class="c">📌 验收：${esc(m.check||"")}</span>
-        </div>
-      </label>`).join("");
-    const fcHTML=(P.finalCheck||[]).map(x=>`
-      <label><input type="checkbox" data-domain="${esc(data.title)}" data-final="${esc(x)}"> ${esc(x)}</label>`).join("");
     c3.innerHTML=`
-      <h2><span class="tag c3">实战项目</span> ${esc(P.title||"")}</h2>
+      <h2><span class="tag c3">实战项目</span> ${esc(P.title||"")} <span class="badge">点开看可执行内容</span></h2>
       <p class="sub">周期：${esc(P.duration||"")}　|　完成后能证明：你不是"看了"，而是"会了"</p>
       <div class="deliv">📦 最终交付物：${esc(P.deliverable||"")}</div>
       <h4 style="margin:14px 0 4px;font-size:13px;color:var(--c3)">📅 里程碑（勾选 = 当天完成）</h4>
-      <div class="milestones">${msHTML}</div>
+      <div class="milestones">${(P.milestones||[]).map(m=>`
+        <label class="ms">
+          <input type="checkbox" data-domain="${esc(data.title)}" data-day="${m.day}" data-task="${esc(m.task||"")}">
+          <div>
+            <div class="t">第 ${m.day} 天：${esc(m.task||"")}</div>
+            <span class="c">📌 验收：${esc(m.check||"")}</span>
+          </div>
+        </label>`).join("")}</div>
       <div class="checks">
-        <h4>✅ 最终验收标准（全部勾上 = 项目真正完成）</h4>
-        ${fcHTML}
-      </div>`;
+        <h4>✅ 最终验收标准</h4>
+        ${(P.finalCheck||[]).map(x=>`<label><input type="checkbox" data-domain="${esc(data.title)}" data-final="${esc(x)}"> ${esc(x)}</label>`).join("")}
+      </div>
+      <h4 style="margin:14px 0 4px;font-size:13px;color:var(--c3)">🎯 可执行任务（点开看答案/产出）</h4>
+      <div class="practical">${(P.practical||[]).map(pr=>`
+        <div class="prac">
+          <div class="ptitle"><span><span class="kind">${esc(pr.kind||"任务")}</span> ${esc(pr.title||"")}</span><button class="reveal">显示要求/答案</button></div>
+          <div class="pspec">${esc(pr.spec||"")}</div>
+          <div class="pexp">${esc(pr.expected||"")}</div>
+        </div>`).join("")}</div>`;
     r.appendChild(c3);
+    // 勾选持久化
+    c3.querySelectorAll('input[type=checkbox][data-domain]').forEach(cb=>{
+      const key="aiLearn.v3.check."+cb.dataset.domain+"."+(cb.dataset.day?"day"+cb.dataset.day:"final")+"."+(cb.dataset.day?cb.dataset.task:cb.dataset.final);
+      cb.checked = localStorage.getItem(key)==="1";
+      cb.addEventListener("change", ()=>localStorage.setItem(key, cb.checked?"1":"0"));
+    });
+    // 可执行任务展开
+    c3.querySelectorAll(".prac").forEach(el=>{
+      el.querySelector(".ptitle").addEventListener("click", e=>{ e.stopPropagation(); el.classList.toggle("open"); el.querySelector(".reveal").textContent = el.classList.contains("open") ? "隐藏" : "显示要求/答案"; });
+    });
   }
 
-  // 绑定 markdown 复制 & 勾选状态持久化
   $("#copyMd")?.addEventListener("click", ()=>copyAsMarkdown(data));
-  document.querySelectorAll('input[type=checkbox][data-domain]').forEach(cb=>{
-    const key="aiLearn.v2.check."+cb.dataset.domain+"."+(cb.dataset.day?"day"+cb.dataset.day:"final")+"."+(cb.dataset.day?cb.dataset.task:cb.dataset.final);
-    cb.checked = localStorage.getItem(key)==="1";
-    cb.addEventListener("change", ()=>{
-      localStorage.setItem(key, cb.checked?"1":"0");
-    });
-  });
 }
 
-/* ===== 7. 导出 Markdown ===== */
+/* ===== 8. Markdown 导出 ===== */
 function toMarkdown(data){
   let md=`# ${data.title||""}\n\n> ${data.oneLiner||""}\n\n`;
   md+=`## 🎯 20% 核心概念\n\n`;
   (data.core20||[]).forEach(c=>{
-    md+=`- **${c.name}**（${c.weight}%）—— ${c.why}  ⚠ ${c.pitfall}\n`;
+    md+=`### ${c.name}（${c.weight}%）\n\n**简介**：${c.summary||""}\n\n**详细**：${c.detail||""}\n\n`;
+    if(c.example) md+=`**例子**：\n\`\`\`\n${c.example}\n\`\`\`\n\n`;
+    if(c.keyPoints?.length) md+=`**要点**：${c.keyPoints.map(x=>"- "+x).join("\n")}\n\n`;
+    md+=`**易错点**：${c.pitfall||""}\n\n---\n\n`;
   });
-  md+=`\n## 📚 课程计划\n\n`;
+  md+=`## 📚 课程计划\n\n`;
   (data.lessons||[]).forEach(L=>{
-    md+=`### ${L.title}\n- **学习目标**：${L.goal}\n- **涉及概念**：${(L.concepts||[]).join("、")}\n`;
-    md+=`- **练习内容**：\n${(L.exercises||[]).map(x=>"  - "+x).join("\n")}\n`;
-    md+=`- **参考资源**：${(L.resources||[]).map(x=>`\`${x.type}\` ${x.name}`).join("；")}\n`;
-    md+=`- **复习题**：\n${(L.review||[]).map(x=>"  - "+x).join("\n")}\n\n`;
+    md+=`### ${L.title}\n\n**学习目标**：${L.goal||""}\n\n`;
+    md+=`**练习**：\n${(L.exercises||[]).map(x=>`- Q: ${x.q}\n  - A: ${x.a}`).join("\n")}\n\n`;
+    md+=`**资源**：${(L.resources||[]).map(x=>`- [${x.type}] ${x.name}${x.url?` (${x.url})`:""}${x.note?` — ${x.note}`:""}`).join("\n")}\n\n`;
+    md+=`**复习题**：\n${(L.review||[]).map(x=>`- Q: ${x.q}\n  - A: ${x.a}`).join("\n")}\n\n---\n\n`;
   });
   if(data.capstone){
     const P=data.capstone;
-    md+=`## 🚀 实战项目：${P.title}\n\n**周期**：${P.duration}\n\n**交付物**：${P.deliverable}\n\n### 里程碑\n`;
-    (P.milestones||[]).forEach(m=>md+=`- [ ] **第 ${m.day} 天**：${m.task}　📌 ${m.check}\n`);
-    md+=`\n### 最终验收\n`;
-    (P.finalCheck||[]).forEach(x=>md+=`- [ ] ${x}\n`);
+    md+=`## 🚀 实战项目：${P.title}\n\n**周期**：${P.duration}  **交付物**：${P.deliverable}\n\n`;
+    md+=`### 里程碑\n${(P.milestones||[]).map(m=>`- [ ] **第 ${m.day} 天**：${m.task}  📌 ${m.check}`).join("\n")}\n\n`;
+    md+=`### 最终验收\n${(P.finalCheck||[]).map(x=>`- [ ] ${x}`).join("\n")}\n\n`;
+    md+=`### 可执行任务\n${(P.practical||[]).map(p=>`#### [${p.kind}] ${p.title}\n\n**要求**：${p.spec}\n\n**预期产出**：${p.expected}\n`).join("\n")}\n`;
   }
   return md;
 }
 function copyAsMarkdown(data){
   const md=toMarkdown(data);
-  navigator.clipboard?.writeText(md).then(()=>flash("ok","📋 Markdown 已复制到剪贴板")).catch(()=>{
-    // fallback
-    const ta=document.createElement("textarea"); ta.value=md; document.body.appendChild(ta); ta.select();
-    document.execCommand("copy"); document.body.removeChild(ta); flash("ok","📋 已复制");
-  });
+  navigator.clipboard?.writeText(md).then(()=>flash("ok","📋 Markdown 已复制"),()=>fallbackCopy(md));
+}
+function fallbackCopy(md){
+  const ta=document.createElement("textarea"); ta.value=md; document.body.appendChild(ta); ta.select();
+  try{document.execCommand("copy"); flash("ok","📋 已复制");}catch(e){flash("err","复制失败，请手动导出");}
+  document.body.removeChild(ta);
 }
 function downloadMd(data){
   const md=toMarkdown(data);
   const blob=new Blob([md],{type:"text/markdown;charset=utf-8"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=(data.title||"学习手册")+".md";
-  a.click(); URL.revokeObjectURL(a.href);
+  a.href=URL.createObjectURL(blob); a.download=(data.title||"学习手册")+".md"; a.click();
+  URL.revokeObjectURL(a.href);
 }
 
-/* ===== 8. 历史 ===== */
-const HISTORY_KEY="aiLearn.v2.history";
+/* ===== 9. 历史 ===== */
+const HISTORY_KEY="aiLearn.v3.history";
 function loadHistory(){ try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||[]}catch{return[]} }
 function saveHistory(arr){ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }
 function pushHistory(domain, data){
   const arr=loadHistory();
   const i=arr.findIndex(x=>x.domain===domain);
-  const item={domain, data, createdAt:Date.now()};
+  const item={domain,data,createdAt:Date.now()};
   if(i>=0) arr[i]=item; else arr.push(item);
   if(arr.length>20) arr=arr.slice(-20);
-  saveHistory(arr);
-  renderHistory();
+  saveHistory(arr); renderHistory();
 }
 function renderHistory(){
   const list=loadHistory().slice().reverse();
@@ -567,11 +639,7 @@ function renderHistory(){
   card.style.display="";
   w.innerHTML=list.map(it=>{
     const d=new Date(it.createdAt);
-    const dateStr=`${d.getMonth()+1}/${d.getDate()}`;
-    return `<span class="hist-item" data-domain="${esc(it.domain)}">
-      <span>${esc(it.domain)}</span>
-      <span style="color:var(--muted);font-size:11px">${dateStr}</span>
-    </span>`;
+    return `<span class="hist-item" data-domain="${esc(it.domain)}">${esc(it.domain)} · ${d.getMonth()+1}/${d.getDate()}</span>`;
   }).join("");
   w.querySelectorAll(".hist-item").forEach(el=>{
     el.addEventListener("click", ()=>{
@@ -581,33 +649,35 @@ function renderHistory(){
   });
 }
 
-/* ===== 9. 状态提示 ===== */
+/* ===== 10. 状态提示 ===== */
 function flash(type, msg, extra){
   const c={"ok":"ok","err":"err","note":"note"}[type]||"note";
   let html=`<div class="${c}">${esc(msg)}`;
-  if(extra) html+=`<details><summary>查看错误详情（可点击展开）</summary><pre style="white-space:pre-wrap;font-size:12px;margin:6px 0 0">${esc(extra)}</pre></details>`;
+  if(extra) html+=`<details><summary>查看错误详情</summary><pre style="white-space:pre-wrap;font-size:12px;margin:6px 0 0">${esc(extra)}</pre></details>`;
   html+=`</div>`;
   $("#status").innerHTML=html;
 }
 
-/* ===== 10. 主流程 ===== */
+/* ===== 11. 主流程 ===== */
 async function generate(){
   const domain=$("#domain").value.trim();
   if(!domain){ flash("err","请先填写学习领域"); return; }
   const goal=$("#goal").value.trim();
   const level=$("#level").value;
   const s=getSettings();
-  if(!s.relayOn && (!s.key||!s.base||!s.model)){ flash("err","请先在 ⚙ 设置 中填 API Key（或启用中转模式）"); document.getElementById("setPanel").open=true; return; }
+  if(!s.relayOn && (!s.key||!s.base||!s.model)){
+    flash("err","请先在 ⚙ 设置 中填 API Key（推荐 DeepSeek-V3 或 GLM-4-Plus）");
+    document.getElementById("setPanel").open=true; return;
+  }
 
   const genBtn=$("#gen");
-  genBtn.disabled=true;
-  $("#exportMd").disabled=true;
-  flash("note",`<span class="spinner"></span>正在为「${esc(domain)}」凝练核心、设计课程、规划实战项目…（1 次生成，约 10~25 秒）`);
+  genBtn.disabled=true; $("#exportMd").disabled=true;
+  flash("note",`<span class="spinner"></span>正在为「${esc(domain)}」深度生成（含详细解释/题目/答案/实战）…（1 次调用，约 15~40 秒）`);
 
   try{
-    const data=await callAI(USER_PROMPT({domain, goal, level}));
+    const data=await callAI(USER_PROMPT({domain,goal,level}));
     if(!data.core20 || !data.lessons || !data.capstone){
-      throw new Error("模型返回缺少关键字段（core20/lessons/capstone），原始数据："+JSON.stringify(data).slice(0,200));
+      throw new Error("模型返回缺少关键字段。原始数据："+JSON.stringify(data).slice(0,200));
     }
     renderPlan(data);
     pushHistory(domain, data);
@@ -622,23 +692,21 @@ async function generate(){
   }
 }
 
-/* ===== 11. 事件绑定 ===== */
+/* ===== 12. 事件绑定 ===== */
 document.getElementById("gen").addEventListener("click", generate);
 document.getElementById("openSet").addEventListener("click", ()=>document.getElementById("setPanel").open=true);
 document.getElementById("provider").addEventListener("change", applyPreset);
 document.getElementById("saveSet").addEventListener("click", saveSettings);
 document.getElementById("clearSet").addEventListener("click", ()=>{
-  localStorage.removeItem("aiLearn.v2.settings");
+  localStorage.removeItem("aiLearn.v3.settings");
   $("#base").value=""; $("#key").value=""; $("#model").value=""; $("#relayUrl").value=""; $("#relayToken").value="";
   flash("note","已清除设置");
 });
 
-/* ===== 12. 初始化 ===== */
+/* ===== 13. 初始化 ===== */
 loadSettings();
 renderHistory();
-if(DEFAULT_RELAY){
-  flash("ok","✓ 中转模式已默认启用（Key 在服务器，浏览器无 Key）");
-}
+if(DEFAULT_RELAY){ flash("ok","✓ 中转模式已默认启用（Key 在服务器，浏览器无 Key）"); }
 </script>
 </body>
 </html>
