@@ -1,0 +1,13 @@
+{
+  "name": "ai-learn-relay",
+  "version": "1.0.0",
+  "description": "AI学习引擎 · 带 Key 的中转服务（Key 存在服务器，浏览器永不暴露）",
+  "main": "relay-server.js",
+  "scripts": {
+    "start": "node relay-server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

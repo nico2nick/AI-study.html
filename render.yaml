@@ -1,0 +1,19 @@
+# Render 部署蓝图：把本仓库一键变成「带 Key 的中转服务」
+# 在 Render 新建 Web Service 并连接此 GitHub 仓库后，Render 会自动读取本文件。
+services:
+  - type: web
+    name: ai-learn-relay
+    runtime: node
+    plan: free                      # 免费额度，无需信用卡
+    branch: main
+    buildCommand: "npm install"
+    startCommand: "node relay-server.js"
+    envVars:
+      - key: RELAY_API_KEY          # 你的真实大模型 Key（如 DeepSeek），部署时必填
+        sync: false
+      - key: RELAY_BASE             # 大模型 Base URL（已预填 DeepSeek，一般不用改）
+        value: https://api.deepseek.com/v1
+      - key: RELAY_MODEL            # 默认模型（前端也可单独指定）
+        value: deepseek-v4-flash
+      - key: RELAY_TOKEN            # 访问口令，自己随便设一个；填到 relay-config.js 的 token 里
+        sync: false
