@@ -265,6 +265,16 @@ const PRESETS={
   "custom":      {base:"", model:""}
 };
 const RELAY_CFG = (typeof window.APP_RELAY==="object" && window.APP_RELAY) ? window.APP_RELAY : {};
+// 前端下拉框的「长名字」→ 中转认识的「短名字」
+const RELAY_PROVIDER_KEY = {
+  "zhipu-plus":"zhipu", "zhipu-flash":"zhipu",
+  "deepseek-v3":"deepseek",
+  "qwen-max":"qwen", "qwen-plus":"qwen",
+  "moonshot":"moonshot",
+  "siliconflow":"siliconflow",
+  "openai":"openai",
+  "custom":"custom"
+};
 const DEFAULT_RELAY = RELAY_CFG.url || "";
 const DEFAULT_RELAY_TOKEN = RELAY_CFG.token || "";
 
@@ -423,7 +433,7 @@ async function callOnce(userPrompt, s, isRelay){
     const body={model:s.model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.6, max_tokens:6000};
     if(attempt===1) body.messages[1].content += "\n\n【重申】只返回完整 JSON，禁止代码块围栏、禁止解释、禁止截断！所有 detail 不少于 100 字，所有 q 必须配 a。";
     if(isRelay){
-      body.provider = s.provider;
+      body.provider = RELAY_PROVIDER_KEY[s.provider] || s.provider;
       if(s.relayToken) body.token=s.relayToken;
       var res=await fetch(s.relayUrl.replace(/\/$/,""),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     }else{
