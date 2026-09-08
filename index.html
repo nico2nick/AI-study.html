@@ -207,8 +207,22 @@
       <input id="relayToken" type="password" placeholder="访问口令(可选)" style="max-width:150px">
       <button class="linkbtn" id="showRelay">说明</button>
     </div>
+    <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <label style="font-size:12px;color:var(--muted)">服务商（中转模式）：</label>
+      <select id="relayProvider" style="padding:5px 8px;border-radius:6px;border:1px solid #cfc8ee;background:#fff;font-size:13px">
+        <option value="zhipu">智谱 GLM（默认·推荐·免费层）</option>
+        <option value="deepseek">DeepSeek（性价比之王）</option>
+        <option value="qwen">通义千问 Qwen</option>
+        <option value="moonshot">月之暗面 Kimi</option>
+        <option value="siliconflow">硅基流动（白嫖 DeepSeek-V3）</option>
+        <option value="openai">OpenAI</option>
+      </select>
+      <button class="linkbtn" id="probeBtn">🚀 测速全部</button>
+      <span id="probeResult" style="font-size:12px;color:var(--muted);flex:1"></span>
+    </div>
     <div id="relayBox" class="hidden" style="margin-top:8px;font-size:12px;color:var(--muted)">
-      把 API Key 放在你自己的服务器（<code>relay-server.js</code>）上，网页只把「提示词」发给中转，Key 永不出现在浏览器里。最适合把网页<strong>分享给朋友</strong>、或<strong>在手机上免配置</strong>使用。本地调试可把 relay 跑在 <code>http://localhost:8788</code>。注意中转地址需允许跨域（已内置 CORS）。
+      把 API Key 放在你自己的服务器（<code>relay-server.js</code>）上，网页只把「提示词」发给中转，Key 永不出现在浏览器里。最适合把网页<strong>分享给朋友</strong>、或<strong>在手机上免配置</strong>使用。本地调试可把 relay 跑在 <code>http://localhost:8788</code>。注意中转地址需允许跨域（已内置 CORS）。<br>
+      <b>多服务商模式</b>：在 Railway/Render 环境变量里同时配多个 <code>RELAY_KEY_ZHIPU</code> / <code>RELAY_KEY_DEEPSEEK</code> / <code>RELAY_KEY_QWEN</code> …此处切换即生效，无需重新部署中转。
     </div>
 
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -269,6 +283,7 @@
 
 </div>
 
+<script src="relay-config.js"></script>
 <script>
 /* ============ 配置 ============ */
 const PRESETS = {
@@ -280,6 +295,11 @@ const PRESETS = {
   siliconflow:{base:"https://api.siliconflow.cn/v1", model:"deepseek-ai/DeepSeek-V3"},
   custom:{base:"", model:""}
 };
+// —— 中转默认配置（来自同目录的 relay-config.js，部署后只需改那一个文件）——
+const RELAY_CFG = (typeof window.APP_RELAY==="object" && window.APP_RELAY) ? window.APP_RELAY : {};
+const DEFAULT_RELAY = RELAY_CFG.url || "";
+const DEFAULT_RELAY_TOKEN = RELAY_CFG.token || "";
+const DEFAULT_RELAY_PROVIDER = RELAY_CFG.provider || "zhipu";
 const STAGES = [
   {key:"anchor", num:"阶段 1 · 元学习定锚", tag:"t-orange", method:"十倍速", desc:"目标 / 路线 / 20% 核心"},
   {key:"input",  num:"阶段 2 · 高效输入",   tag:"t-orange", method:"十倍速", desc:"10倍输入 · 二八 · 主动检索"},
@@ -287,7 +307,7 @@ const STAGES = [
   {key:"feynman",num:"阶段 4 · 费曼输出",   tag:"t-green",  method:"费曼", desc:"教小白 · 查漏 · 简化"},
   {key:"system", num:"阶段 5 · 系统化·应用",tag:"t-purple", method:"融合", desc:"知识树 · 项目 · 复盘"}
 ];
-const SYS = "你是一位顶尖学习设计师与跨学科教育专家，擅长把任何领域拆解为零基础可循序渐进掌握的学习路径，并能多视角分析、用通俗类比解释、设计项目与自测题。始终使用简体中文，回答必须是严格合法的 JSON（不要包含 markdown 代码块围栏），字段须与要求完全一致。";
+const SYS = "你是一位顶尖学习设计师与跨学科教育专家，擅长把任何领域拆解为零基础可循序渐进掌握的学习路径，并能多视角分析、用通俗类比解释、设计项目与自测题。始终使用简体中文，回答必须是严格合法的 JSON（不要包含 markdown 代码块围栏），字段须与要求完全一致。\n\n回答必须遵守的硬规则：\n1. 任何资源必须是「具体的、可点击/可搜索的真实名称」，例如：书名《X》、课程名「X公开课」、网站「X.com」、论文《X》(作者, 年份)、纪录片《X》B站搜「X」。\n2. 严禁出现以下占位/糊弄：「暂无」「待查」「推荐相关书籍」「网上搜一下」「自由安排」「按需学习」等模糊短语。每个字段必须给 ≥1 条具体资源。\n3. 即使你不 100% 确定资源完美对口，也必须给出一个最佳推测的具体名称（标注「推荐」即可），不要留空。\n4. 所有 JSON 字段名与提示词要求完全一致；值若为数组，按要求条数。";
 const REVIEW_OFFSETS = [1,3,7,16,30];
 const PROXY_SCRIPT = `// local-proxy.js  —— 解决浏览器直连大模型 API 的 CORS 跨域问题
 // 用法：保存为 local-proxy.js，终端运行  node local-proxy.js
@@ -400,22 +420,30 @@ const RENDER = {anchor:renderAnchor, input:renderInput, storm:renderStorm, feynm
 /* ============ 设置 / 历史 / 复习 ============ */
 function loadSettings(){
   const raw=localStorage.getItem("aiLearn.settings");
-  if(!raw){ $("#preset").value="deepseek"; applyPreset(); return; }
+  if(!raw){ $("#preset").value="deepseek"; applyPreset();
+    if(DEFAULT_RELAY){ $("#relayOn").checked=true; $("#relayUrl").value=DEFAULT_RELAY; if(DEFAULT_RELAY_TOKEN) $("#relayToken").value=DEFAULT_RELAY_TOKEN; }
+    if(DEFAULT_RELAY_PROVIDER){ $("#relayProvider").value=DEFAULT_RELAY_PROVIDER; syncModelFromProvider(DEFAULT_RELAY_PROVIDER); }
+    return; }
   try{const s=JSON.parse(raw);
     if(s.preset)$("#preset").value=s.preset;
     if(s.base)$("#base").value=s.base; if(s.key)$("#key").value=s.key; if(s.model)$("#model").value=s.model;
     if(s.proxyOn)$("#proxyOn").checked=!!s.proxyOn; if(s.proxyUrl)$("#proxyUrl").value=s.proxyUrl;
     if(s.relayOn)$("#relayOn").checked=!!s.relayOn; if(s.relayUrl)$("#relayUrl").value=s.relayUrl; if(s.relayToken)$("#relayToken").value=s.relayToken;
+    if(s.relayProvider){ $("#relayProvider").value=s.relayProvider; }
   }catch(e){}
 }
 function saveSettings(){
   const s={preset:$("#preset").value, base:$("#base").value.trim(), key:$("#key").value.trim(),
            model:$("#model").value.trim(), proxyOn:$("#proxyOn").checked, proxyUrl:$("#proxyUrl").value.trim(),
-           relayOn:$("#relayOn").checked, relayUrl:$("#relayUrl").value.trim(), relayToken:$("#relayToken").value.trim()};
+           relayOn:$("#relayOn").checked, relayUrl:$("#relayUrl").value.trim(), relayToken:$("#relayToken").value.trim(),
+           relayProvider:$("#relayProvider").value};
   localStorage.setItem("aiLearn.settings",JSON.stringify(s));
   $("#status").innerHTML=`<div class="note">设置已保存到本地浏览器。</div>`;
   if(s.proxyOn) checkProxy();
 }
+// 中转模式下，切换服务商时同步模型名为该服务商的默认模型
+const PROVIDER_DEFAULT_MODELS = { zhipu:"glm-4-flash", deepseek:"deepseek-chat", qwen:"qwen-plus", moonshot:"moonshot-v1-8k", siliconflow:"deepseek-ai/DeepSeek-V3", openai:"gpt-4o-mini", custom:"" };
+function syncModelFromProvider(p){ const m=PROVIDER_DEFAULT_MODELS[p]; if(m) $("#model").value=m; }
 function getSettings(){ try{return JSON.parse(localStorage.getItem("aiLearn.settings")||"{}");}catch(e){return{};} }
 function applyPreset(){ const p=PRESETS[$("#preset").value]; if(p){ $("#base").value=p.base; $("#model").value=p.model; } }
 
@@ -542,8 +570,9 @@ async function callRelay(userPrompt, s){
   const url=s.relayUrl.replace(/\/$/,"");
   if(!url) throw new Error("请在中转设置里填写「中转地址」（如 https://你的域名/generate）。");
   const model=s.model||"";
-  if(!model) throw new Error("中转模式也需要填写「模型名」（在服务端 provider 上有效的模型，如 deepseek-v4-flash）。");
-  const body={model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.7};
+  if(!model) throw new Error("中转模式也需要填写「模型名」（在服务端 provider 上有效的模型，如 deepseek-chat）。");
+  const provider=s.relayProvider||"zhipu";
+  const body={provider, model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.7};
   if(s.relayToken) body.token=s.relayToken;
   let res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
   if(!res.ok){ const t=await res.text().catch(()=> ""); throw new Error("中转返回 "+res.status+"："+t.slice(0,200)); }
@@ -588,24 +617,92 @@ async function generateWrapped(){
   const domain=$("#domain").value.trim();
   if(!domain){ $("#status").innerHTML=`<div class="err">请先填写学习领域。</div>`; return; }
   const goal=$("#goal").value.trim(), level=$("#level").value;
-  $("#status").innerHTML=`<div class="note">正在为「${esc(domain)}」生成专属学习计划，请稍候（共 5 步，逐步填充）…</div>`;
+  const s=getSettings();
+  const providerName={zhipu:"智谱",deepseek:"DeepSeek",qwen:"通义千问",moonshot:"月之暗面",siliconflow:"硅基流动",openai:"OpenAI"}[s.relayProvider||"zhipu"] || (s.relayOn?"中转":"直连");
+  $("#status").innerHTML=`<div class="note">正在为「${esc(domain)}」生成专属学习计划（${providerName} · 先确定 20% 核心，再并行生成其余 4 步）…</div>`;
   buildShell(); setProgress(0);
   const plan={domain,goal,level}; currentPlan=plan;
-  const order=["anchor","input","storm","feynman","system"];
-  for(let i=0;i<order.length;i++){
-    const key=order[i]; litStage(i); setProgress(i);
-    const ctx=summarize(plan);
-    const userP = key==="anchor" ? PROMPTS.anchor(domain,goal,level) : PROMPTS[key](domain,ctx);
-    try{ const data=await callAPI(userP); plan[key]=data; $("#body-"+i).innerHTML=RENDER[key](data); $("#body-"+i).classList.remove("loading"); }
-    catch(e){ $("#body-"+i).innerHTML=`<div class="err">第 ${i+1} 步生成失败：${esc(e.message)}<br>可点击该阶段标题右侧「↻ 重新生成此步」重试。</div>`; $("#body-"+i).classList.remove("loading"); $("#status").innerHTML=`<div class="err">生成中断：${esc(e.message)}</div>`; break; }
-    setProgress(i+1);
+  // 第 1 阶段：anchor 单独跑（其他 4 个都依赖它的核心概念）
+  litStage(0); setProgress(0);
+  try{
+    const anchorData=await callAPI(PROMPTS.anchor(domain,goal,level));
+    plan.anchor=anchorData; $("#body-0").innerHTML=RENDER.anchor(anchorData); $("#body-0").classList.remove("loading");
+    setProgress(1);
+  }catch(e){
+    $("#body-0").innerHTML=`<div class="err">第 1 步生成失败：${esc(e.message)}<br>由于其余 4 步都依赖核心概念，第 1 步是必需的。请检查服务商/Key/网络后重试。</div>`;
+    $("#body-0").classList.remove("loading");
+    $("#status").innerHTML=`<div class="err">第 1 步失败，已停止。请点击该阶段标题右侧「↻ 重新生成此步」重试，或切换服务商再试。</div>`;
+    setProgress(0); bindCopies(); bindRegen(plan);
+    return;
   }
+  // 第 2~5 阶段：4 个并行（它们都用同样的 anchor 上下文，互不依赖）
+  const remaining=[{key:"input",i:1},{key:"storm",i:2},{key:"feynman",i:3},{key:"system",i:4}];
+  remaining.forEach(r=>litStage(r.i));
+  const tasks = remaining.map(r=>{
+    const userP = PROMPTS[r.key](domain, summarize(plan));
+    return (async()=>{
+      try{
+        const data=await callAPI(userP);
+        plan[r.key]=data;
+        $("#body-"+r.i).innerHTML=RENDER[r.key](data);
+        $("#body-"+r.i).classList.remove("loading");
+      }catch(e){
+        $("#body-"+r.i).innerHTML=`<div class="err">第 ${r.i+1} 步生成失败：${esc(e.message)}<br>其他阶段不受影响，可点本阶段「↻ 重新生成此步」单独重试。</div>`;
+        $("#body-"+r.i).classList.remove("loading");
+      }
+      const doneCount = Object.keys(plan).filter(k=>plan[k]).length - 1; // 排除 meta 字段
+      setProgress(doneCount);
+      return r.key;
+    })();
+  });
+  await Promise.allSettled(tasks);
   bindCopies(); bindRegen(plan);
-  if($("#body-4").querySelector(".err")===null){
+  // 历史/提示：只在 5 个都成功时才自动保存
+  const allOk = plan.input && plan.storm && plan.feynman && plan.system;
+  if(allOk){
     pushHistory(domain, plan);
-    $("#status").innerHTML=`<div class="note">✅ 「${esc(domain)}」学习计划已生成并保存，已为你排好 1/3/7/16/30 天复习提醒。</div>`;
-    updateBanner();
+    $("#status").innerHTML=`<div class="note">✅ 「${esc(domain)}」学习计划已全部生成并保存（${providerName}），已为你排好 1/3/7/16/30 天复习提醒。</div>`;
+  } else {
+    const failed=[];
+    if(!plan.input)failed.push("2"); if(!plan.storm)failed.push("3"); if(!plan.feynman)failed.push("4"); if(!plan.system)failed.push("5");
+    pushHistory(domain, plan); // 部分保存也行
+    $("#status").innerHTML=`<div class="note">⚠️ 「${esc(domain)}」计划已部分保存（缺失第 ${failed.join("、")} 步）。失败阶段点↻重新生成即可。</div>`;
   }
+  updateBanner();
+}
+// 测速：同时探查所有可选服务商（中转模式下）
+async function probeProviders(){
+  const s=getSettings();
+  if(!s.relayOn){ $("#probeResult").textContent="请先开启「中转模式」"; return; }
+  const url=s.relayUrl.replace(/\/$/,"")+"/providers";
+  $("#probeResult").textContent="查询中…";
+  try{
+    const r=await fetch(url,{method:"GET",headers:{"Content-Type":"application/json"}});
+    if(!r.ok){ $("#probeResult").textContent="中转不可达："+r.status; return; }
+    const info=await r.json();
+    const providers=info.providers||[];
+    if(!providers.length){ $("#probeResult").textContent="中转未配置任何服务商"; return; }
+    $("#probeResult").textContent="正在测速 "+providers.length+" 个服务商…";
+    const results = await Promise.allSettled(providers.map(async p=>{
+      const t0=Date.now();
+      const pr=await fetch(s.relayUrl.replace(/\/$/,"")+"/probe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({provider:p, token:s.relayToken})});
+      const j=await pr.json();
+      return {provider:p, ok:!!j.ok, latencyMs:j.latencyMs||(Date.now()-t0), error:j.error};
+    }));
+    results.sort((a,b)=> (a.value&&b.value? (a.value.latencyMs-b.value.latencyMs) : (a.value?-1:1)));
+    const tags=results.map(x=>{
+      if(x.status!=="fulfilled") return `<span style="color:#c00">未知错误</span>`;
+      const v=x.value;
+      const color=v.ok?"#0a7":"#c00";
+      const speed=v.ok?(v.latencyMs<1500?"⚡":v.latencyMs<3000?"⏱":"🐢"):"";
+      return `<span style="color:${color};margin-right:10px" data-p="${v.provider}" class="probe-tag" style="cursor:pointer">${v.provider} ${speed} ${v.ok?v.latencyMs+"ms":"失败"}</span>`;
+    }).join("·");
+    $("#probeResult").innerHTML=tags + ` <span style="font-size:11px;color:var(--muted)">（点名称可一键切换）</span>`;
+    // 点击测速结果切换服务商
+    document.querySelectorAll(".probe-tag").forEach(el=>{
+      el.onclick=()=>{ const p=el.getAttribute("data-p"); $("#relayProvider").value=p; syncModelFromProvider(p); saveSettings(); $("#probeResult").innerHTML=`<span style="color:#0a7">已切换到 ${p}，并把模型名同步成默认值。</span>`; };
+    });
+  }catch(e){ $("#probeResult").textContent="失败："+e.message; }
 }
 function bindCopies(){ document.querySelectorAll(".copy").forEach(b=>{ if(b._b)return; b._b=1; b.onclick=()=>{ copyText(b.getAttribute("data-copy")); const o=b.textContent; b.textContent="已复制"; setTimeout(()=>b.textContent=o,1200); }; }); }
 function bindRegen(plan){
@@ -731,7 +828,7 @@ $("#gear").onclick=()=>{ $("#settings").classList.toggle("show"); if($("#setting
 $("#preset").onchange=applyPreset;
 $("#proxyOn").onchange=()=>{ if($("#proxyOn").checked) checkProxy(); };
 $("#saveSet").onclick=saveSettings;
-$("#clearSet").onclick=()=>{ localStorage.removeItem("aiLearn.settings"); $("#base").value="";$("#key").value="";$("#model").value=""; $("#relayUrl").value="";$("#relayToken").value=""; $("#status").innerHTML=`<div class="note">已清除本地 API 设置。</div>`; };
+$("#clearSet").onclick=()=>{ localStorage.removeItem("aiLearn.settings"); $("#base").value="";$("#key").value="";$("#model").value=""; $("#relayUrl").value="";$("#relayToken").value=""; $("#relayProvider").value=DEFAULT_RELAY_PROVIDER; $("#status").innerHTML=`<div class="note">已清除本地 API 设置。</div>`; };
 $("#gen").onclick=()=>{ const s=getSettings(); if(!s.key && !s.relayOn){ templateMode(); } else { generateWrapped(); } };
 $("#demo").onclick=demo;
 $("#showHist").onclick=()=>{ const c=$("#histCard"); c.classList.toggle("hidden"); if(!c.classList.contains("hidden")) renderHistory(); };
@@ -745,6 +842,8 @@ $("#impBackup").onclick=()=>$("#importFile").click();
 $("#importFile").onchange=(e)=>{ if(e.target.files[0]) importBackup(e.target.files[0]); e.target.value=""; };
 $("#showProxy").onclick=()=>{ const b=$("#proxyBox"); b.classList.toggle("hidden"); if(!b.classList.contains("hidden")) $("#proxyCode").textContent=PROXY_SCRIPT; };
 $("#showRelay").onclick=()=>{ const b=$("#relayBox"); b.classList.toggle("hidden"); };
+$("#probeBtn").onclick=probeProviders;
+$("#relayProvider").onchange=(e)=>{ syncModelFromProvider(e.target.value); saveSettings(); };
 $("#calPrev").onclick=()=>{ const d=new Date(calY??new Date().getFullYear(),(calM??new Date().getMonth())-1,1); calY=d.getFullYear(); calM=d.getMonth(); renderCalendar(); };
 $("#calNext").onclick=()=>{ const d=new Date(calY??new Date().getFullYear(),(calM??new Date().getMonth())+1,1); calY=d.getFullYear(); calM=d.getMonth(); renderCalendar(); };
 
