@@ -2,587 +2,342 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AI 学习引擎 · 输入领域即生成学习计划</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 学习引擎 · 凝练 20% · 课程化 · 可验收</title>
 <style>
   :root{
-    --orange:#BA7517; --orange-bg:#FAEEDA;
-    --blue:#185FA5;   --blue-bg:#E6F1FB;
-    --green:#3B6D11;  --green-bg:#EAF3DE;
-    --purple:#534AB7; --purple-bg:#EEEDFE;
+    --c1:#534AB7; --c1-bg:#EEEDFE;   /* 核心概念：紫 */
+    --c2:#3B6D11; --c2-bg:#EAF3DE;   /* 课程计划：绿 */
+    --c3:#BA7517; --c3-bg:#FAEEDA;   /* 实战项目：橙 */
+    --c4:#185FA5; --c4-bg:#E6F1FB;   /* 检验：蓝 */
     --ink:#1f2024; --muted:#6b6f76; --line:#e6e3db; --bg:#f6f5f1; --card:#fff;
+    --ok:#0a7c2f; --err:#b3261e;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
-  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);
-       background:var(--bg);line-height:1.6;font-size:15px;-webkit-text-size-adjust:100%}
-  .container{max-width:1080px;margin:0 auto;padding:18px 16px 64px}
-  header.app{border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;background:#fff}
-  header.app h1{font-size:21px;margin:0 0 4px}
-  header.app p{margin:0;color:var(--muted);font-size:13px}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;font-size:15px;-webkit-text-size-adjust:100%}
+  .wrap{max-width:980px;margin:0 auto;padding:18px 14px 80px}
+  header{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+  header h1{margin:0 0 4px;font-size:20px}
+  header p{margin:0;color:var(--muted);font-size:13px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:12px}
+  .card h2{margin:0 0 10px;font-size:17px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+  .tag.c1{background:var(--c1-bg);color:var(--c1)}
+  .tag.c2{background:var(--c2-bg);color:var(--c2)}
+  .tag.c3{background:var(--c3-bg);color:var(--c3)}
+  .tag.c4{background:var(--c4-bg);color:var(--c4)}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
-  .grid{display:grid;gap:12px}
-  .g3{grid-template-columns:2fr 2fr 1fr}
-  .g2{grid-template-columns:1fr 1fr}
-  .field{display:flex;flex-direction:column;gap:4px;min-width:0}
-  .field label{font-size:12px;color:var(--muted)}
-  input,select,textarea{font-family:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);
-           border-radius:10px;background:#fff;color:var(--ink);width:100%}
-  input:focus,select:focus,textarea:focus{outline:2px solid #c9c2f0;border-color:#c9c2f0}
-  .btn{border:none;border-radius:10px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;color:#fff;background:var(--ink);white-space:nowrap}
+  /* 顶部输入栏 */
+  .gen{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+  .gen .row{display:grid;grid-template-columns:1fr 1fr 130px;gap:10px;margin-bottom:10px}
+  @media(max-width:680px){.gen .row{grid-template-columns:1fr 1fr}}
+  .gen input,.gen select{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);outline:none;width:100%}
+  .gen input:focus,.gen select:focus{border-color:var(--c1)}
+  .gen .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{font:inherit;font-weight:600;border:0;border-radius:10px;padding:9px 14px;cursor:pointer;color:#fff;background:var(--c1)}
   .btn:hover{opacity:.92}
-  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
-  .btn.sm{padding:7px 12px;font-size:13px}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
-  .toolbar .spacer{flex:1}
-  .linkbtn{font-size:13px;color:var(--blue);cursor:pointer;background:none;border:none;padding:6px 8px}
+  .btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);font-weight:500}
+  .btn.secondary:hover{background:#fafaf6}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .linkbtn{background:none;border:0;color:var(--c1);cursor:pointer;font:inherit;padding:4px 6px}
   .linkbtn:hover{text-decoration:underline}
 
-  .tag{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;font-weight:600;margin-right:6px;vertical-align:middle}
-  .t-orange{background:var(--orange-bg);color:var(--orange)}
-  .t-blue{background:var(--blue-bg);color:var(--blue)}
-  .t-green{background:var(--green-bg);color:var(--green)}
-  .t-purple{background:var(--purple-bg);color:var(--purple)}
+  .status{margin-top:8px;font-size:13px;line-height:1.6}
+  .status .note{color:var(--muted)}
+  .status .ok{color:var(--ok)}
+  .status .err{color:var(--err)}
+  .status .err details{margin-top:6px;padding:8px 10px;background:#fff5f5;border:1px solid #f3d4d1;border-radius:8px}
+  .status .err summary{cursor:pointer;color:var(--err);font-weight:600}
 
-  .settings{display:none}
-  .settings.show{display:block}
-  .toggle{display:flex;align-items:center;gap:10px;background:#f4f2ec;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px;flex-wrap:wrap}
-  .switch{position:relative;width:44px;height:24px;flex:none}
-  .switch input{opacity:0;width:0;height:0}
-  .slider{position:absolute;inset:0;background:#ccc;border-radius:999px;transition:.2s;cursor:pointer}
-  .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
-  .switch input:checked + .slider{background:var(--purple)}
-  .switch input:checked + .slider:before{transform:translateX(20px)}
+  /* 结果区 */
+  .hero{padding:18px 20px}
+  .hero h2{font-size:22px;margin:0 0 4px}
+  .hero .oneliner{margin:0;color:var(--muted);font-size:14px}
+  .meta-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 
-  .progress{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
-  .chip{font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:#fff}
-  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .chip.done{background:var(--green-bg);color:var(--green);border-color:#cfe6b8}
+  /* 核心概念 */
+  .concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+  .concept{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+  .concept .name{font-weight:600;font-size:15px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .concept .name .pct{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--c1-bg);color:var(--c1);font-weight:700}
+  .concept .why{margin:0 0 6px;color:#444;font-size:13.5px}
+  .concept .pitfall{margin:0;color:var(--err);font-size:12.5px}
 
-  .stage{border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:14px 0;background:#fff;position:relative;opacity:.4;transition:opacity .3s}
-  .stage.lit{opacity:1}
-  .stage .num{position:absolute;top:-12px;left:18px;background:var(--ink);color:#fff;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:600}
-  .stage h3{margin:4px 0 2px;font-size:17px;padding-right:74px}
-  .block{margin:12px 0}
-  .block .bh{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .copy{font-size:12px;border:1px solid var(--line);background:#fff;border-radius:6px;padding:3px 9px;cursor:pointer;color:var(--muted);flex:none}
-  .copy:hover{background:#f0eee8;color:var(--ink)}
-  .speak{position:absolute;top:12px;right:14px;font-size:12px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 10px;cursor:pointer;color:var(--blue);white-space:nowrap}
-  .speak:hover{background:#eef3fb}
-  .speak.on{background:var(--blue);color:#fff;border-color:var(--blue)}
-  .pinbtn{cursor:pointer;margin-left:6px;color:var(--orange);font-weight:700;user-select:none}
-  .pinbtn:hover{text-decoration:none}
-  .box{border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:#fbfaf7;font-size:14px}
-  .box.md h4{margin:10px 0 4px;font-size:15px}
-  .box.md h5{margin:8px 0 3px;font-size:14px;color:#444}
-  .box.md ul{margin:4px 0;padding-left:20px}
-  .box.md p{margin:5px 0}
-  .kv{display:flex;gap:10px;flex-wrap:wrap}
-  .lvl{flex:1;min-width:200px;border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:#fff}
-  .lvl b{display:block;margin-bottom:5px}
-  .pill{display:inline-block;background:#f0eee8;border-radius:6px;padding:3px 9px;margin:2px 4px 2px 0;font-size:13px}
-  .regen{font-size:12px;color:var(--blue);cursor:pointer;text-decoration:underline;margin-left:10px;font-weight:400}
-  .note{background:#fff8e8;border:1px solid #f0dca8;border-radius:10px;padding:11px 13px;color:#7a5a10;font-size:13px;margin:10px 0}
-  .err{background:#fdecec;border:1px solid #f3b5b5;color:#a32d2d;border-radius:10px;padding:11px 13px;font-size:13px;margin:10px 0}
-  .banner{background:var(--purple-bg);border:1px solid #cfc8ee;color:#3c3489;border-radius:12px;padding:11px 14px;font-size:14px;margin-bottom:14px;display:none}
-  .banner.show{display:block}
-  .hist{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .hchip{font-size:13px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer}
-  .hchip:hover{background:#f0eee8}
-  .hchip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-left:6px;vertical-align:middle}
-  .hchip .dot.due{background:#d8553a}
-  .loading{font-size:13px;color:var(--muted);padding:4px 0}
-  .spinner{display:inline-block;width:12px;height:12px;border:2px solid #ccc;border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:-1px}
+  /* 课程 */
+  .lessons{display:flex;flex-direction:column;gap:10px}
+  .lesson{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+  .lesson summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .lesson summary::-webkit-details-marker{display:none}
+  .lesson summary::before{content:"▸";color:var(--c2);transition:transform .15s;display:inline-block;width:14px}
+  .lesson[open] summary::before{transform:rotate(90deg)}
+  .lesson summary .badge{margin-left:auto;background:var(--c2-bg);color:var(--c2);font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600}
+  .lesson-body{padding:0 14px 14px;display:grid;gap:8px}
+  .lesson-body .row{font-size:13.5px}
+  .lesson-body .row b{color:var(--c2);display:block;margin-bottom:2px;font-size:12px;font-weight:600}
+  .lesson-body ul{margin:0;padding-left:20px}
+  .lesson-body li{margin-bottom:3px}
+  .res{display:inline-block;background:#f6f5f1;border:1px solid var(--line);border-radius:8px;padding:3px 9px;margin:2px 4px 2px 0;font-size:12.5px}
+  .res .t{color:var(--muted);font-size:11px;margin-right:4px}
+
+  /* 实战项目 */
+  .project{border:1px solid var(--c3);border-radius:12px;background:#fff;padding:14px 16px;margin-bottom:10px}
+  .project h3{margin:0 0 4px;font-size:16px;color:var(--c3)}
+  .project .sub{color:var(--muted);font-size:13px;margin-bottom:10px}
+  .project .deliv{background:var(--c3-bg);border-radius:8px;padding:8px 10px;margin:8px 0;font-size:13.5px}
+  .milestones{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .ms{display:grid;grid-template-columns:42px 1fr;gap:8px;align-items:start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fcfbf7}
+  .ms .d{font-weight:700;color:var(--c3);text-align:center;background:#fff;border:1px solid var(--c3);border-radius:6px;padding:3px 0;font-size:12px}
+  .ms .t{font-size:13.5px}
+  .ms .c{color:var(--muted);font-size:12px;display:block;margin-top:2px}
+  .checks{background:#fcfbf7;border:1px dashed var(--c3);border-radius:10px;padding:10px 14px;margin-top:10px}
+  .checks h4{margin:0 0 6px;font-size:13px;color:var(--c3)}
+  .checks label{display:flex;gap:6px;align-items:start;padding:3px 0;font-size:13.5px;cursor:pointer}
+
+  /* 检验 */
+  .review-list{font-size:13.5px}
+  .review-list li{margin-bottom:4px}
+
+  /* 历史 */
+  .hist{display:flex;flex-wrap:wrap;gap:6px}
+  .hist-item{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .hist-item:hover{border-color:var(--c1)}
+  .hist-item .star{color:#d4a72c}
+  .hist-item .x{color:var(--muted);margin-left:2px}
+  .hist-item .x:hover{color:var(--err)}
+
+  /* 设置面板 */
+  details.set{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px 14px;margin-top:10px}
+  details.set>summary{list-style:none;cursor:pointer;font-weight:600;font-size:14px}
+  details.set>summary::-webkit-details-marker{display:none}
+  details.set>summary::before{content:"⚙ ";opacity:.7}
+  .set-body{margin-top:10px;display:grid;gap:8px}
+  .set-row{display:grid;grid-template-columns:130px 1fr;gap:8px;align-items:center;font-size:13px}
+  .set-row input,.set-row select{font:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:8px;width:100%;background:#fff}
+
+  /* 工具类 */
+  .hidden{display:none!important}
+  .empty{text-align:center;color:var(--muted);padding:30px 16px;font-size:14px}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--c1);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
-  pre.proxy{background:#1f2024;color:#e7e7e7;border-radius:10px;padding:12px;font-size:12px;overflow:auto;max-height:260px;white-space:pre}
-  .review-item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0;background:#fff}
-  .review-item .meta{font-size:13px;color:var(--muted);margin-bottom:6px}
-  textarea.recall{min-height:60px;margin-top:8px}
-  .hidden{display:none}
-
-  /* calendar */
-  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:440px;margin-top:8px}
-  .cal .dow{font-size:11px;color:var(--muted);text-align:center;padding:4px 0}
-  .cal .day{aspect-ratio:1/1;border:1px solid var(--line);border-radius:9px;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;background:#fff;padding:2px}
-  .cal .day.muted{color:#cfccc4;cursor:default}
-  .cal .day.today{outline:2px solid var(--purple);outline-offset:-2px}
-  .cal .day .dot{width:6px;height:6px;border-radius:50%;background:var(--purple);position:absolute;bottom:5px}
-  .cal .day.due .dot{background:#d8553a}
-  .cal .day.empty{border:none;background:none;cursor:default}
-
-  /* flashcards print */
-  .card-flash{border:1px solid #999;border-radius:10px;padding:12px 14px;margin:12px 0;page-break-inside:avoid}
-  .card-flash h4{margin:0 0 6px}
-  .card-flash .front{background:#fbfaf7;border-radius:8px;padding:8px 10px;margin-bottom:8px}
-  .card-flash .back{background:#eef6ee;border-radius:8px;padding:8px 10px}
-  .card-flash .lbl{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:3px}
-  #printCards{display:none}
-
-  @media(max-width:760px){
-    .g3,.g2{grid-template-columns:1fr}
-    header.app h1{font-size:19px}
-    .container{padding:12px 10px 56px}
-    .card{padding:14px 13px}
-    .stage{padding:14px 13px}
-    .cal{max-width:100%}
-  }
+  details>summary{cursor:pointer}
+  .row-act{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .copy-btn{font-size:12px;padding:4px 8px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;color:var(--muted)}
+  .copy-btn:hover{color:var(--ink);border-color:var(--ink)}
   @media print{
-    body *{visibility:hidden}
-    #printCards,#printCards *{visibility:visible}
-    #printCards{display:block;position:absolute;left:0;top:0;width:100%}
-    .no-print{display:none !important}
+    body{background:#fff}
+    .gen,.row-act,.hist details.set{display:none!important}
+    .card{break-inside:avoid;border:1px solid #ddd;box-shadow:none}
   }
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
 
-<header class="app no-print">
-  <h1>AI 学习引擎</h1>
-  <p>输入一个领域，自动生成分阶段学习计划 + 该领域的具体内容（20% 核心概念、学习顺序、资源、类比、多视角大纲、费曼检验、可动手项目）。数据仅存于本机浏览器。</p>
+<header>
+  <h1>AI 学习引擎 <span style="color:var(--muted);font-weight:400;font-size:13px">· 凝练 20% · 课程化 · 可验收</span></h1>
+  <p>输入一个领域，AI 凝练其最核心的 20% 概念与技能、拆成几次可执行课、附一个能证明「真的会用」的实战小项目。</p>
 </header>
 
-<div class="card no-print">
-  <div class="grid g3">
-    <div class="field"><label>学习领域（必填）</label><input id="domain" placeholder="例如：机器学习 / 微观经济学 / 吉他"></div>
-    <div class="field"><label>我的目标 / 用途（可选）</label><input id="goal" placeholder="例如：转行做数据分析"></div>
-    <div class="field"><label>当前水平</label>
-      <select id="level"><option>零基础</option><option>有点基础</option><option>较熟练</option></select>
-    </div>
+<!-- 输入区 -->
+<div class="gen">
+  <div class="row">
+    <input id="domain" placeholder="学习领域（必填），如：初二数学 / 雅思口语 / Python 入门">
+    <input id="goal" placeholder="目标/用途（可选），如：3 个月内能考到 6.5 分">
+    <select id="level">
+      <option value="零基础">零基础</option>
+      <option value="入门">入门</option>
+      <option value="进阶">进阶</option>
+      <option value="专家">专家</option>
+    </select>
   </div>
-  <div class="toolbar">
-    <button class="btn" id="gen">生成学习计划</button>
-    <button class="btn ghost" id="demo">载入示例(无需API)</button>
-    <button class="linkbtn" id="gear">⚙ 设置/Key</button>
-    <button class="linkbtn" id="showHist">📚 历史</button>
-    <button class="linkbtn" id="showReview">🔔 复习日历</button>
-    <button class="linkbtn" id="expMd">⬇ 笔记MD</button>
-    <button class="linkbtn" id="expPdf">⬇ 笔记PDF</button>
-    <span class="spacer"></span>
+  <div class="actions">
+    <button class="btn" id="gen">生成学习手册</button>
+    <button class="btn secondary" id="exportMd" disabled>📥 导出 Markdown</button>
+    <button class="linkbtn" id="openSet">⚙ 设置</button>
   </div>
+  <div id="status" class="status"></div>
 
-  <div class="settings" id="settings">
-    <div class="note" style="color:#3c3489;background:var(--purple-bg);border-color:#cfc8ee">
-      <b>第一次用？3 步：</b>① 上方选 <b>DeepSeek</b>（已默认）；② 打开 platform.deepseek.com 注册→实名→API Keys 创建密钥→支付宝/微信充值；③ 把 Key 粘到下方，回到主页点「生成」。不想填 Key 可先点「载入示例」体验。想把网页<b>分享给别人</b>或在<b>手机上免配置</b>用，可部署 <code>relay-server.js</code> 后勾选下方「带 Key 的中转」。
-    </div>
-    <div class="grid g2" style="margin-top:10px">
-      <div class="field"><label>服务商预设</label>
-        <select id="preset">
-          <option value="deepseek">DeepSeek（国内直连·推荐）</option>
-          <option value="moonshot">Kimi / Moonshot</option>
-          <option value="zhipu">智谱 AI（有免费层）</option>
-          <option value="qwen">通义千问（有免费层）</option>
-          <option value="siliconflow">硅基流动（多模型·有赠送）</option>
-          <option value="openai">OpenAI</option>
+  <details class="set" id="setPanel">
+    <summary>设置（API Key · 中转服务 · 模型名）</summary>
+    <div class="set-body">
+      <div class="set-row">
+        <label>服务商</label>
+        <select id="provider">
+          <option value="zhipu">智谱 GLM（推荐·国内免费层）</option>
+          <option value="deepseek">DeepSeek（强推理·便宜）</option>
+          <option value="qwen">通义千问（阿里·免费层）</option>
+          <option value="moonshot">月之暗面 Kimi</option>
+          <option value="siliconflow">硅基流动（白嫖多家）</option>
+          <option value="openai">OpenAI（国内需代理）</option>
           <option value="custom">自定义</option>
         </select>
       </div>
-      <div class="field"><label>API Key</label><input id="key" type="password" placeholder="sk-...  仅存本机浏览器"></div>
-      <div class="field"><label>API Base URL</label><input id="base" placeholder="https://api.deepseek.com/v1"></div>
-      <div class="field"><label>模型名</label><input id="model" placeholder="如 deepseek-v4-flash"></div>
-    </div>
-    <div class="field" style="margin-top:8px"><label style="color:var(--muted);font-size:12px">
-      模型名请以服务商当前文档为准（DeepSeek 现用 deepseek-v4-flash / deepseek-v4-pro）。若浏览器报 CORS 跨域错误，开启下方「本地代理」即可彻底规避。
-    </label></div>
-
-    <div class="toggle">
-      <label class="switch"><input type="checkbox" id="proxyOn"><span class="slider"></span></label>
-      <div class="field" style="flex:1"><label>启用本地代理（规避 CORS）</label>
-        <input id="proxyUrl" value="http://localhost:8787" placeholder="http://localhost:8787"></div>
-      <span id="proxyStatus" style="font-size:12px;color:var(--muted)"></span>
-      <button class="linkbtn" id="showProxy">查看代理脚本</button>
-    </div>
-    <div id="proxyBox" class="hidden" style="margin-top:8px">
-      <pre class="proxy" id="proxyCode"></pre>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">
-        <b>傻瓜式启动：</b>直接双击工作目录里的 <code>启动代理.bat</code>（Windows）即可，保持窗口开着。密钥只经你本机转发，不经第三方。需要 Node.js（已自带则无需安装）。
+      <div class="set-row"><label>API Base URL</label><input id="base" placeholder="如：https://api.deepseek.com/v1"></div>
+      <div class="set-row"><label>API Key</label><input id="key" type="password" placeholder="sk-…（仅本机浏览器保存）"></div>
+      <div class="set-row"><label>模型名</label><input id="model" placeholder="如：glm-4-flash / deepseek-chat / qwen-plus"></div>
+      <div class="set-row">
+        <label>中转模式</label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="relayOn"> 启用</label>
+          <input id="relayUrl" placeholder="https://你的中转/generate" style="flex:1;min-width:200px">
+          <input id="relayToken" type="password" placeholder="口令（可选）" style="max-width:120px">
+        </div>
+      </div>
+      <div class="set-row" style="text-align:right">
+        <label></label>
+        <div style="display:flex;gap:8px">
+          <button class="btn secondary" id="saveSet">保存</button>
+          <button class="btn secondary" id="clearSet">清除</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted)">
+        <b>第一次用：</b>1) 选服务商 · 2) 注册该平台拿 Key · 3) 粘到 API Key · 4) 回到主页点「生成」。或启用「中转模式」让别人共享的 Key 替你跑（Key 不出现在浏览器）。
       </div>
     </div>
-
-    <div class="toggle" style="border-color:#cfc8ee;background:var(--purple-bg);margin-top:10px">
-      <label class="switch"><input type="checkbox" id="relayOn"><span class="slider"></span></label>
-      <div class="field" style="flex:1"><label>启用「带 Key 的中转」服务（分享/手机用，Key 不落前端）</label>
-        <input id="relayUrl" placeholder="https://你的中转地址/generate"></div>
-      <input id="relayToken" type="password" placeholder="访问口令(可选)" style="max-width:150px">
-      <button class="linkbtn" id="showRelay">说明</button>
-    </div>
-    <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <label style="font-size:12px;color:var(--muted)">服务商（中转模式）：</label>
-      <select id="relayProvider" style="padding:5px 8px;border-radius:6px;border:1px solid #cfc8ee;background:#fff;font-size:13px">
-        <option value="zhipu">智谱 GLM（默认·推荐·免费层）</option>
-        <option value="deepseek">DeepSeek（性价比之王）</option>
-        <option value="qwen">通义千问 Qwen</option>
-        <option value="moonshot">月之暗面 Kimi</option>
-        <option value="siliconflow">硅基流动（白嫖 DeepSeek-V3）</option>
-        <option value="openai">OpenAI</option>
-      </select>
-      <button class="linkbtn" id="probeBtn">🚀 测速全部</button>
-      <span id="probeResult" style="font-size:12px;color:var(--muted);flex:1"></span>
-    </div>
-    <div id="relayBox" class="hidden" style="margin-top:8px;font-size:12px;color:var(--muted)">
-      把 API Key 放在你自己的服务器（<code>relay-server.js</code>）上，网页只把「提示词」发给中转，Key 永不出现在浏览器里。最适合把网页<strong>分享给朋友</strong>、或<strong>在手机上免配置</strong>使用。本地调试可把 relay 跑在 <code>http://localhost:8788</code>。注意中转地址需允许跨域（已内置 CORS）。<br>
-      <b>多服务商模式</b>：在 Railway/Render 环境变量里同时配多个 <code>RELAY_KEY_ZHIPU</code> / <code>RELAY_KEY_DEEPSEEK</code> / <code>RELAY_KEY_QWEN</code> …此处切换即生效，无需重新部署中转。
-    </div>
-
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <button class="btn ghost" id="saveSet">保存设置</button>
-      <button class="linkbtn" id="clearSet">清除设置</button>
-      <span style="flex:1"></span>
-      <button class="linkbtn" id="expBackup">💾 导出备份</button>
-      <button class="linkbtn" id="impBackup">📥 恢复备份</button>
-      <input type="file" id="importFile" accept="application/json" class="hidden">
-    </div>
-    <div style="font-size:12px;color:var(--muted);margin-top:8px">
-      换手机/电脑学习？点「导出备份」存成文件，在另一台设备打开本网页后点「恢复备份」即可同步全部计划与设置。
-    </div>
-  </div>
+  </details>
 </div>
 
-<div class="banner" id="reviewBanner"></div>
+<!-- 结果区 -->
+<div id="result"></div>
 
-<div class="progress no-print" id="progress">
-  <span class="chip" data-s="0">1 · 元学习定锚</span>
-  <span class="chip" data-s="1">2 · 高效输入</span>
-  <span class="chip" data-s="2">3 · 多视角建构</span>
-  <span class="chip" data-s="3">4 · 费曼输出</span>
-  <span class="chip" data-s="4">5 · 系统化·应用</span>
+<!-- 历史 -->
+<div class="card" id="histCard" style="display:none">
+  <h2>📚 历史计划</h2>
+  <div class="hist" id="hist"></div>
 </div>
-
-<div id="status"></div>
-
-<div class="card no-print hidden" id="histCard">
-  <h3 style="margin-top:0;font-size:16px">历史计划</h3>
-  <div class="hist" id="histWrap"></div>
-</div>
-
-<div class="card no-print hidden" id="reviewCard">
-  <h3 style="margin-top:0;font-size:16px">间隔复习 · 日历与提醒</h3>
-  <div class="grid g2">
-    <div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong id="calTitle"></strong>
-        <div><button class="btn sm ghost" id="calPrev">‹</button> <button class="btn sm ghost" id="calNext">›</button></div>
-      </div>
-      <div class="cal" id="calGrid"></div>
-      <div id="calList" style="margin-top:8px;font-size:13px;color:var(--muted)"></div>
-    </div>
-    <div>
-      <div class="meta" style="font-size:13px;color:var(--muted);margin-bottom:6px">待复习（今天及之前到期）</div>
-      <div id="reviewList"></div>
-      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn sm" id="expCardsPdf">导出复习卡片(PDF)</button>
-        <button class="btn sm ghost" id="expCardsMd">导出复习卡片(MD)</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="wrap" id="stages"></div>
-<div id="printCards"></div>
 
 </div>
 
+<!-- ============= JS ============= -->
 <script src="relay-config.js"></script>
 <script>
-/* ============ 配置 ============ */
-const PRESETS = {
-  openai:{base:"https://api.openai.com/v1", model:"gpt-4o-mini"},
-  deepseek:{base:"https://api.deepseek.com/v1", model:"deepseek-v4-flash"},
-  moonshot:{base:"https://api.moonshot.cn/v1", model:"moonshot-v1-8k"},
+"use strict";
+
+/* ===== 1. 预设 ===== */
+const PRESETS={
   zhipu:{base:"https://open.bigmodel.cn/api/paas/v4", model:"glm-4-flash"},
+  deepseek:{base:"https://api.deepseek.com/v1", model:"deepseek-chat"},
   qwen:{base:"https://dashscope.aliyuncs.com/compatible-mode/v1", model:"qwen-plus"},
-  siliconflow:{base:"https://api.siliconflow.cn/v1", model:"deepseek-ai/DeepSeek-V3"},
+  moonshot:{base:"https://api.moonshot.cn/v1", model:"moonshot-v1-8k"},
+  siliconflow:{base:"https://api.siliconflow.cn/v1", model:"Qwen/Qwen2.5-72B-Instruct"},
+  openai:{base:"https://api.openai.com/v1", model:"gpt-4o-mini"},
   custom:{base:"", model:""}
 };
-// —— 中转默认配置（来自同目录的 relay-config.js，部署后只需改那一个文件）——
 const RELAY_CFG = (typeof window.APP_RELAY==="object" && window.APP_RELAY) ? window.APP_RELAY : {};
 const DEFAULT_RELAY = RELAY_CFG.url || "";
 const DEFAULT_RELAY_TOKEN = RELAY_CFG.token || "";
-const DEFAULT_RELAY_PROVIDER = RELAY_CFG.provider || "zhipu";
-const STAGES = [
-  {key:"anchor", num:"阶段 1 · 元学习定锚", tag:"t-orange", method:"十倍速", desc:"目标 / 路线 / 20% 核心"},
-  {key:"input",  num:"阶段 2 · 高效输入",   tag:"t-orange", method:"十倍速", desc:"10倍输入 · 二八 · 主动检索"},
-  {key:"storm",  num:"阶段 3 · 多视角建构", tag:"t-blue",   method:"STORM", desc:"多角色提问 · 大纲综合"},
-  {key:"feynman",num:"阶段 4 · 费曼输出",   tag:"t-green",  method:"费曼", desc:"教小白 · 查漏 · 简化"},
-  {key:"system", num:"阶段 5 · 系统化·应用",tag:"t-purple", method:"融合", desc:"知识树 · 项目 · 复盘"}
-];
-const SYS = "你是一位顶尖学习设计师与跨学科教育专家，擅长把任何领域拆解为零基础可循序渐进掌握的学习路径，并能多视角分析、用通俗类比解释、设计项目与自测题。始终使用简体中文，回答必须是严格合法的 JSON（不要包含 markdown 代码块围栏），字段须与要求完全一致。\n\n回答必须遵守的硬规则：\n1. 任何资源必须是「具体的、可点击/可搜索的真实名称」，例如：书名《X》、课程名「X公开课」、网站「X.com」、论文《X》(作者, 年份)、纪录片《X》B站搜「X」。\n2. 严禁出现以下占位/糊弄：「暂无」「待查」「推荐相关书籍」「网上搜一下」「自由安排」「按需学习」等模糊短语。每个字段必须给 ≥1 条具体资源。\n3. 即使你不 100% 确定资源完美对口，也必须给出一个最佳推测的具体名称（标注「推荐」即可），不要留空。\n4. 所有 JSON 字段名与提示词要求完全一致；值若为数组，按要求条数。";
-const REVIEW_OFFSETS = [1,3,7,16,30];
-const PROXY_SCRIPT = `// local-proxy.js  —— 解决浏览器直连大模型 API 的 CORS 跨域问题
-// 用法：保存为 local-proxy.js，终端运行  node local-proxy.js
-//       然后在网页「API 设置」中开启「本地代理」并填入 http://localhost:8787
-const http = require('http');
-const https = require('https');
-const url = require('url');
-const PORT = 8787;
-const server = http.createServer((req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
-  const parsed = url.parse(req.url, true);
-  const target = parsed.query.url;
-  if (!target) { res.writeHead(400); return res.end('missing url param'); }
-  const chunks = [];
-  req.on('data', c => chunks.push(c));
-  req.on('end', () => {
-    const body = Buffer.concat(chunks);
-    const t = url.parse(target);
-    const lib = t.protocol === 'https:' ? https : http;
-    const options = { method: req.method, hostname: t.hostname,
-      port: t.port || (t.protocol === 'https:' ? 443 : 80), path: t.path,
-      headers: Object.assign({}, req.headers, { host: t.host }) };
-    delete options.headers['origin']; delete options.headers['referer'];
-    const proxy = lib.request(options, (resp) => { res.writeHead(resp.statusCode, resp.headers); resp.pipe(res); });
-    proxy.on('error', (e) => { res.writeHead(502); res.end('proxy error: ' + e.message); });
-    if (body.length) proxy.write(body);
-    proxy.end();
-  });
-});
-server.listen(PORT, () => console.log('本地 CORS 代理已启动：http://localhost:8787'));`;
 
-/* ============ 提示词 ============ */
-function pAnchor(d,g,l){return `领域：${d}\n学习者当前水平：${l}\n学习目的/用途：${g||"泛了解与入门"}\n请输出严格 JSON：\n{\n "oneLiner":"用一句话+一个生活类比说明该领域到底是什么",\n "roadmap":[\n   {"level":1,"name":"入门","mustKnow":["必须掌握的2-4个核心概念"],"resources":["推荐资源类型与具体名称建议1-2条"]},\n   {"level":2,"name":"进阶","mustKnow":[...],"resources":[...]},\n   {"level":3,"name":"精通","mustKnow":[...],"resources":[...]}\n ],\n "mvp20":["用二八法则筛选出的、最重要的20%核心概念清单（5-8条）"]\n}`;}
-function pInput(d,c){return `领域：${d}\n前面已确定该领域核心概念包括：${c}\n请输出严格 JSON：\n{\n "analogies":["用10个不同生活类比解释该领域最核心概念，从最通俗到较专业排序"],\n "threeLayer":[{"layer":"表层直觉","explain":"大白话解释","example":"一个例子"},{"layer":"中层机制","explain":"...","example":"..."},{"layer":"深层原理","explain":"...","example":"..."}],\n "pareto":["掌握这20%知识能解决80%实际问题的具体点（4-6条）"]\n}`;}
-function pStorm(d,c){return `领域：${d}\n背景：${c}\n请输出严格 JSON：\n{\n "expertQuestions":[\n   {"role":"实践者","questions":["关键追问1","2","3"]},\n   {"role":"理论家","questions":[...]},\n   {"role":"批评者","questions":[...]},\n   {"role":"跨界者","questions":[...]},\n   {"role":"初学者","questions":[...]}\n ],\n "outline":"基于以上多视角问答，生成一份结构化知识大纲（用 Markdown 层级表示概念与依赖关系）",\n "devilsAdvocate":["对大纲的挑错：可能的错误/遗漏/偏见（3条）"]\n}`;}
-function pFeynman(d,c){return `领域：${d}\n背景：${c}\n请输出严格 JSON：\n{\n "simplified":"假设要给一个完全不懂的零基础听众讲清该领域，用大白话+类比重写的通俗解释（300字内）",\n "checklist":["讲解中容易含糊/跳步/易错的点（3-5条）"],\n "elevator":"30秒电梯演讲版（一句话说清）"\n}`;}
-function pSystem(d,c){return `领域：${d}\n背景：${c}\n请输出严格 JSON：\n{\n "conceptMap":"用 Markdown 层级+关系描述该领域的概念地图（可标注已掌握/待巩固）",\n "project":"一个2小时内能动手完成、可验证理解的'最小可行项目'描述",\n "reviewQs":["3道跨概念综合应用题，每题含题目与评分标准"]\n}`;}
-const PROMPTS = {anchor:pAnchor, input:pInput, storm:pStorm, feynman:pFeynman, system:pSystem};
-
-/* ============ 工具 ============ */
-const $ = s=>document.querySelector(s);
-let currentPlan=null;
-function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-function formatMD(text){
-  const lines = String(text||"").split("\n"); let html="", inList=false;
-  const bold = s=>s.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
-  for(let raw of lines){
-    if(/^#\s+/.test(raw)){ if(inList){html+="</ul>";inList=false;} html+="<h4>"+bold(raw.replace(/^#\s+/,""))+"</h4>"; }
-    else if(/^##\s+/.test(raw)){ if(inList){html+="</ul>";inList=false;} html+="<h5>"+bold(raw.replace(/^##\s+/,""))+"</h5>"; }
-    else if(/^(?:-|\*)\s+/.test(raw)){ if(!inList){html+="<ul>";inList=true;} html+="<li>"+bold(raw.replace(/^(?:-|\*)\s+/,""))+"</li>"; }
-    else if(raw.trim()===""){ if(inList){html+="</ul>";inList=false;} }
-    else { if(inList){html+="</ul>";inList=false;} html+="<p>"+bold(raw)+"</p>"; }
-  }
-  if(inList) html+="</ul>"; return html;
-}
-function copyText(t){ if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>{}); }
-function block(title, content, raw, md){
-  return `<div class="block"><div class="bh"><span>${title}</span><button class="copy" data-copy="${esc(raw)}">复制</button></div>
-    <div class="box ${md?"md":""}">${md?formatMD(content):esc(content)}</div></div>`;
-}
-
-/* ============ 渲染各阶段 ============ */
-function renderAnchor(d){
-  let h = `<div class="block"><div class="bh"><span>一句话定位</span><button class="copy" data-copy="${esc(d.oneLiner)}">复制</button></div><div class="box">${esc(d.oneLiner)}</div></div>`;
-  h += `<div class="block"><div class="bh"><span>分层学习路线图</span></div><div class="kv">`;
-  (d.roadmap||[]).forEach(lv=>{
-    h += `<div class="lvl"><b>第${lv.level}层 · ${esc(lv.name)}</b>`;
-    (lv.mustKnow||[]).forEach(x=>h+=`<span class="pill">${esc(x)}</span>`);
-    h += `<div style="margin-top:6px;font-size:13px;color:var(--muted)">资源：${(lv.resources||[]).map(esc).join("；")}</div></div>`;
-  });
-  h += `</div></div>`;
-  h += `<div class="block"><div class="bh"><span>20% 核心概念清单（二八法则）</span><button class="copy" data-copy="${esc((d.mvp20||[]).join("\n"))}">复制</button></div><div class="box">${(d.mvp20||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div></div>`;
-  return h;
-}
-function renderInput(d){
-  let h = block("10 个生活类比（由通俗到专业）", (d.analogies||[]).map((x,i)=>`${i+1}. ${x}`).join("\n"), (d.analogies||[]).join("\n"));
-  h += `<div class="block"><div class="bh"><span>三层拆解法</span></div><div class="kv">`;
-  (d.threeLayer||[]).forEach(t=>{ h+=`<div class="lvl"><b>${esc(t.layer)}</b><div style="font-size:13px">${esc(t.explain)}</div><div style="font-size:13px;color:var(--muted)">例：${esc(t.example)}</div></div>`; });
-  h += `</div></div>`;
-  h += block("二八清单：掌握这 20% 解决 80% 问题", (d.pareto||[]).map((x,i)=>`${i+1}. ${x}`).join("\n"), (d.pareto||[]).join("\n"));
-  return h;
-}
-function renderStorm(d){
-  let h = `<div class="block"><div class="bh"><span>专家圆桌 · 多视角追问</span></div>`;
-  (d.expertQuestions||[]).forEach(e=>{
-    h += `<div class="lvl" style="margin-bottom:8px"><b>${esc(e.role)}</b>` + (e.questions||[]).map(q=>`<div style="font-size:13px">· ${esc(q)}</div>`).join("") + `</div>`;
-  });
-  h += `</div>`;
-  h += block("综合知识大纲（知识体系骨架）", d.outline||"", d.outline||"", true);
-  h += block("魔鬼代言人 · 挑错", (d.devilsAdvocate||[]).map((x,i)=>`${i+1}. ${x}`).join("\n"), (d.devilsAdvocate||[]).join("\n"));
-  return h;
-}
-function renderFeynman(d){
-  let h = block("大白话重写（教零基础听众）", d.simplified||"", d.simplified||"", true);
-  h += block("易含糊 / 跳步 / 易错点清单", (d.checklist||[]).map((x,i)=>`${i+1}. ${x}`).join("\n"), (d.checklist||[]).join("\n"));
-  h += block("30 秒电梯演讲版", d.elevator||"", d.elevator||"");
-  return h;
-}
-function renderSystem(d){
-  let h = block("概念地图", d.conceptMap||"", d.conceptMap||"", true);
-  h += block("最小可行项目（2 小时内动手）", d.project||"", d.project||"");
-  h += block("综合自测题（含评分标准）", (d.reviewQs||[]).map((x,i)=>`${i+1}. ${x}`).join("\n\n"), (d.reviewQs||[]).join("\n\n"));
-  return h;
-}
-const RENDER = {anchor:renderAnchor, input:renderInput, storm:renderStorm, feynman:renderFeynman, system:renderSystem};
-
-/* ============ 设置 / 历史 / 复习 ============ */
+/* ===== 2. 设置持久化 ===== */
 function loadSettings(){
-  const raw=localStorage.getItem("aiLearn.settings");
-  if(!raw){ $("#preset").value="deepseek"; applyPreset();
-    if(DEFAULT_RELAY){ $("#relayOn").checked=true; $("#relayUrl").value=DEFAULT_RELAY; if(DEFAULT_RELAY_TOKEN) $("#relayToken").value=DEFAULT_RELAY_TOKEN; }
-    if(DEFAULT_RELAY_PROVIDER){ $("#relayProvider").value=DEFAULT_RELAY_PROVIDER; syncModelFromProvider(DEFAULT_RELAY_PROVIDER); }
-    return; }
-  try{const s=JSON.parse(raw);
-    if(s.preset)$("#preset").value=s.preset;
-    if(s.base)$("#base").value=s.base; if(s.key)$("#key").value=s.key; if(s.model)$("#model").value=s.model;
-    if(s.proxyOn)$("#proxyOn").checked=!!s.proxyOn; if(s.proxyUrl)$("#proxyUrl").value=s.proxyUrl;
-    if(s.relayOn)$("#relayOn").checked=!!s.relayOn; if(s.relayUrl)$("#relayUrl").value=s.relayUrl; if(s.relayToken)$("#relayToken").value=s.relayToken;
-    if(s.relayProvider){ $("#relayProvider").value=s.relayProvider; }
+  const raw=localStorage.getItem("aiLearn.v2.settings");
+  if(!raw){
+    $("#provider").value="zhipu"; applyPreset();
+    if(DEFAULT_RELAY){
+      $("#relayOn").checked=true;
+      $("#relayUrl").value=DEFAULT_RELAY;
+      if(DEFAULT_RELAY_TOKEN) $("#relayToken").value=DEFAULT_RELAY_TOKEN;
+    }
+    return;
+  }
+  try{
+    const s=JSON.parse(raw);
+    if(s.provider)$("#provider").value=s.provider;
+    if(s.base)$("#base").value=s.base;
+    if(s.key)$("#key").value=s.key;
+    if(s.model)$("#model").value=s.model;
+    if(s.relayOn)$("#relayOn").checked=!!s.relayOn;
+    if(s.relayUrl)$("#relayUrl").value=s.relayUrl;
+    if(s.relayToken)$("#relayToken").value=s.relayToken;
   }catch(e){}
 }
 function saveSettings(){
-  const s={preset:$("#preset").value, base:$("#base").value.trim(), key:$("#key").value.trim(),
-           model:$("#model").value.trim(), proxyOn:$("#proxyOn").checked, proxyUrl:$("#proxyUrl").value.trim(),
-           relayOn:$("#relayOn").checked, relayUrl:$("#relayUrl").value.trim(), relayToken:$("#relayToken").value.trim(),
-           relayProvider:$("#relayProvider").value};
-  localStorage.setItem("aiLearn.settings",JSON.stringify(s));
-  $("#status").innerHTML=`<div class="note">设置已保存到本地浏览器。</div>`;
-  if(s.proxyOn) checkProxy();
+  const s={
+    provider:$("#provider").value,
+    base:$("#base").value.trim(),
+    key:$("#key").value.trim(),
+    model:$("#model").value.trim(),
+    relayOn:$("#relayOn").checked,
+    relayUrl:$("#relayUrl").value.trim(),
+    relayToken:$("#relayToken").value.trim()
+  };
+  localStorage.setItem("aiLearn.v2.settings", JSON.stringify(s));
+  flash("ok","设置已保存");
 }
-// 中转模式下，切换服务商时同步模型名为该服务商的默认模型
-const PROVIDER_DEFAULT_MODELS = { zhipu:"glm-4-flash", deepseek:"deepseek-chat", qwen:"qwen-plus", moonshot:"moonshot-v1-8k", siliconflow:"deepseek-ai/DeepSeek-V3", openai:"gpt-4o-mini", custom:"" };
-function syncModelFromProvider(p){ const m=PROVIDER_DEFAULT_MODELS[p]; if(m) $("#model").value=m; }
-function getSettings(){ try{return JSON.parse(localStorage.getItem("aiLearn.settings")||"{}");}catch(e){return{};} }
-function applyPreset(){ const p=PRESETS[$("#preset").value]; if(p){ $("#base").value=p.base; $("#model").value=p.model; } }
+function getSettings(){
+  return {
+    provider:$("#provider").value,
+    base:$("#base").value.trim(),
+    key:$("#key").value.trim(),
+    model:$("#model").value.trim(),
+    relayOn:$("#relayOn").checked,
+    relayUrl:$("#relayUrl").value.trim(),
+    relayToken:$("#relayToken").value.trim()
+  };
+}
+function applyPreset(){
+  const p=$("#provider").value;
+  const v=PRESETS[p]||PRESETS.custom;
+  $("#base").value=v.base;
+  $("#model").value=v.model;
+}
+function $(s){return document.querySelector(s)}
 
-function loadHistory(){ try{return JSON.parse(localStorage.getItem("aiLearn.history")||"[]");}catch(e){return[];} }
-function pushHistory(domain, plan){
-  let list=loadHistory();
-  const existing=list.find(x=>x.domain===domain);
-  const pinned=existing?!!existing.pinned:false;
-  list=list.filter(x=>x.domain!==domain);
-  const createdAt=Date.now();
-  const reviews=REVIEW_OFFSETS.map(o=>({offset:o, due:createdAt+o*86400000, done:false}));
-  list.push({domain, plan, ts:createdAt, createdAt, reviews, pinned});
-  if(list.length>30) list=list.slice(-30);
-  localStorage.setItem("aiLearn.history",JSON.stringify(list));
-  renderHistory(); renderReviewPanel();
-}
-function ensureReviews(item){
-  if(!item.reviews || !item.reviews.length) item.reviews=REVIEW_OFFSETS.map(o=>({offset:o, due:item.createdAt+o*86400000, done:false}));
-  return item;
-}
-function nextReview(item){ ensureReviews(item); return item.reviews.find(r=>!r.done)||null; }
-function dueCount(){ const now=Date.now(); let n=0; loadHistory().forEach(it=>{const r=nextReview(it); if(r&&r.due<=now)n++;}); return n; }
-function fmtDate(ts){ const d=new Date(ts); return (d.getMonth()+1)+"月"+d.getDate()+"日"; }
-function renderHistory(){
-  const w=$("#histWrap"); w.innerHTML="";
-  const all=loadHistory().slice();
-  const pinned=all.filter(x=>x.pinned).reverse();
-  const rest=all.filter(x=>!x.pinned).reverse();
-  const ordered=[...pinned,...rest];
-  if(!ordered.length){ w.innerHTML='<span style="color:#aaa;font-size:13px">（暂无，生成后自动保存）</span>'; return; }
-  ordered.forEach(it=>{ const r=nextReview(it); const due=r&&r.due<=Date.now();
-    const c=document.createElement("span"); c.className="hchip";
-    c.innerHTML=(it.pinned?'<b style="color:var(--orange)">★</b> ':'')+esc(it.domain)+`<span class="dot ${due?'due':''}"></span>`;
-    c.onclick=()=>showPlan(it.domain,it.plan);
-    const pin=document.createElement("span"); pin.className="pinbtn"; pin.textContent=it.pinned?'★':'☆';
-    pin.title=it.pinned?'取消置顶':'置顶/收藏';
-    pin.onclick=(e)=>{ e.stopPropagation(); togglePin(it.domain); };
-    c.appendChild(pin);
-    w.appendChild(c);
-  });
-}
-function togglePin(domain){
-  const list=loadHistory(); const it=list.find(x=>x.domain===domain);
-  if(it){ it.pinned=!it.pinned; localStorage.setItem("aiLearn.history",JSON.stringify(list)); renderHistory(); renderReviewPanel(); }
-}
-function renderReviewPanel(){
-  const now=Date.now();
-  // list of due items
-  const listWrap=$("#reviewList"); listWrap.innerHTML="";
-  const due=loadHistory().filter(it=>{const r=nextReview(it); return r&&r.due<=now;});
-  if(!due.length){ listWrap.innerHTML='<div style="color:var(--muted);font-size:13px">🎉 暂时没有到期的复习，按 1/3/7/16/30 天节奏到时会提醒你。</div>'; }
-  due.slice().reverse().forEach((it,idx)=>{
-    const r=nextReview(it);
-    const item=document.createElement("div"); item.className="review-item";
-    item.innerHTML=`<div class="meta"><b style="color:var(--ink)">${esc(it.domain)}</b> · 下次复习：<b>${fmtDate(r.due)}</b> <span style="color:#d8553a">（今天该复习）</span></div>`;
-    const btn=document.createElement("button"); btn.className="btn sm"; btn.textContent="开始复习";
-    btn.onclick=()=>{
-      showPlan(it.domain,it.plan);
-      const elev=it.plan.feynman&&it.plan.feynman.elevator?it.plan.feynman.elevator:"";
-      const recall=document.createElement("div");
-      recall.innerHTML=`<div style="margin-top:10px;border-top:1px dashed var(--line);padding-top:10px">
-        <div style="font-size:13px;font-weight:600">召回测试：先<b>凭记忆</b>写出「${esc(it.domain)}」的 3 个核心概念，再对照计划查漏。</div>
-        <textarea class="recall" placeholder="在这里凭记忆默写…"></textarea>
-        <div style="font-size:12px;color:var(--muted);margin:4px 0">参考（先别看）：<span class="copy" data-copy="${esc(elev)}" style="display:inline-block">点此显示电梯演讲</span></div>
-        <button class="btn sm" id="md-${idx}">标记本次已复习</button></div>`;
-      item.appendChild(recall);
-      recall.querySelector('#md-'+idx).onclick=()=>{ r.done=true; localStorage.setItem("aiLearn.history",JSON.stringify(loadHistory())); renderHistory(); renderReviewPanel(); updateBanner(); $("#status").innerHTML='<div class="note">已记录复习，下次提醒顺延。</div>'; };
-    };
-    item.appendChild(btn); listWrap.appendChild(item);
-  });
-  bindCopies();
-  renderCalendar();
-}
-function renderCalendar(){
-  const now=new Date(); const y=calY??now.getFullYear(), m=calM??now.getMonth();
-  const first=new Date(y,m,1); const startDow=(first.getDay()+6)%7; // Monday-first
-  const days=new Date(y,m+1,0).getDate();
-  $("#calTitle").textContent=y+"年"+(m+1)+"月";
-  const grid=$("#calGrid"); grid.innerHTML="";
-  ["一","二","三","四","五","六","日"].forEach(d=>{ const e=document.createElement("div"); e.className="dow"; e.textContent=d; grid.appendChild(e); });
-  for(let i=0;i<startDow;i++){ const e=document.createElement("div"); e.className="day empty"; grid.appendChild(e); }
-  const nowDate=new Date(); nowDate.setHours(0,0,0,0);
-  const pending=[]; loadHistory().forEach(it=>{ ensureReviews(it); it.reviews.forEach(r=>{ if(!r.done) pending.push({domain:it.domain,due:r.due}); }); });
-  for(let d=1;d<=days;d++){
-    const cell=new Date(y,m,d); cell.setHours(0,0,0,0);
-    const e=document.createElement("div"); e.className="day"; e.textContent=d;
-    if(cell.getMonth()!==m) e.classList.add("muted");
-    if(cell.getTime()===nowDate.getTime()) e.classList.add("today");
-    const dayPending=pending.filter(p=>{ const pd=new Date(p.due); return pd.getFullYear()===y&&pd.getMonth()===m&&pd.getDate()===d; });
-    if(dayPending.length){ const isDue=dayPending.some(p=>p.due<=nowDate.getTime());
-      const dot=document.createElement("span"); dot.className="dot"; e.appendChild(dot);
-      if(isDue) e.classList.add("due");
-      e.onclick=()=>{ const names=[...new Set(dayPending.map(p=>p.domain))].join("、"); $("#calList").innerHTML="<b>"+y+"年"+(m+1)+"月"+d+"日</b> 待复习："+esc(names); };
-    }
-    grid.appendChild(e);
+/* ===== 3. 提示词：单一生成，返回 3 大段 ===== */
+const SYS = `你是一位顶级的学习设计师，擅长把任何领域凝练为「20% 核心 + 几次课 + 一个能证明会用的实战项目」。
+
+严格要求：
+1. 所有书/课/网站必须给具体名称（人教版/可汗学院/B 站关键词/Anki 卡组等），禁止"相关教材""网上资料"等空话。
+2. 练习必须是可数可执行的具体动作（"做 10 道" "30 分钟" "找一个朋友讲 3 分钟"），不是"多做练习"。
+3. 复习题是问答题或操作题，不是"理解本章"。
+4. 实战项目的 milestone 必须按"第 X 天：具体任务 + 验收标准"格式，每条都能在当天被检查是否完成。
+5. 输出的 20% 核心概念数量 = 6~8 个，weight 是占比（加起来=100），按重要性从高到低排。
+6. 课的数量 = 5~7 节，按依赖顺序排，每节聚焦 1~3 个核心概念。
+7. 直接返回 JSON，禁止 markdown 代码块，禁止任何解释文字。`;
+
+/* 用户提示词（更具体） */
+const USER_PROMPT = d=>`领域：${d.domain}
+目标：${d.goal || "（用户未填，默认：能用、能讲清）"}
+水平：${d.level}
+
+请按以下 JSON 格式输出（不要任何多余文字）：
+
+{
+  "title": "领域名",
+  "oneLiner": "一句话定位这个领域是什么、学到什么程度算入门（30 字内）",
+  "core20": [
+    {"name":"概念名","weight": 15, "why":"为什么是核心（30 字内）","pitfall":"最易错/最常误解点（20 字内）"},
+    …6~8 个，按重要性降序，weight 之和 = 100
+  ],
+  "lessons": [
+    {
+      "n": 1,
+      "title": "第1课:xxx",
+      "goal": "学完能…（用动作描述）",
+      "concepts": ["涉及的核心概念名"],
+      "exercises": ["具体练习1（含数量/时长）","具体练习2","具体练习3"],
+      "resources": [
+        {"type":"教材","name":"具体书名/版本"},
+        {"type":"视频","name":"具体课程名或搜索词"},
+        {"type":"工具","name":"具体 APP/网站"}
+      ],
+      "review": ["问答题或操作题1","问答题或操作题2"]
+    },
+    …5~7 节
+  ],
+  "capstone": {
+    "title": "可验收实战项目名",
+    "duration": "X天",
+    "deliverable": "最终可交付物（具体形式）",
+    "milestones": [
+      {"day": 3, "task": "具体任务", "check": "如何验收这一天"},
+      …5~8 个 milestones，day 递增
+    ],
+    "finalCheck": ["最终验收标准1（可观察/可测量）","最终验收标准2","最终验收标准3"]
   }
-}
-function checkProxy(){
-  const s=getSettings(); const url=(s.proxyUrl||"http://localhost:8787").replace(/\/$/,"")+"/";
-  const el=$("#proxyStatus"); if(!el) return;
-  el.textContent="检测中…"; el.style.color="var(--muted)";
-  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),1500);
-  fetch(url,{signal:ctrl.signal,method:"GET"}).then(()=>{ clearTimeout(t); el.textContent="✅ 代理运行中"; el.style.color="var(--green)"; })
-    .catch(()=>{ clearTimeout(t); el.textContent="❌ 未检测到（请先双击 启动代理.bat）"; el.style.color="#d8553a"; });
-}
+}`;
 
-/* ============ API ============ */
-async function callAPI(userPrompt){
-  const s=getSettings();
-  if(s.relayOn) return await callRelay(userPrompt, s);
-  const base=s.base, key=s.key, model=s.model;
-  if(!base||!key||!model) throw new Error("API 设置不完整，请先在 ⚙ 设置 里填写 Base URL / Key / 模型名（或先开启「中转服务」，或先用「载入示例」）。");
-  const target=base.replace(/\/$/,"")+"/chat/completions";
-  const url = s.proxyOn ? (s.proxyUrl.replace(/\/$/,"")+"/?url="+encodeURIComponent(target)) : target;
-  const body={model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.7};
-  let res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify(body)});
-  if(!res.ok){ const t=await res.text().catch(()=> ""); throw new Error("API 返回 "+res.status+"："+t.slice(0,200)); }
-  const j=await res.json();
-  const txt=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-  if(!txt) throw new Error("API 未返回内容。");
-  return parseJSON(txt);
-}
-async function callRelay(userPrompt, s){
-  const url=s.relayUrl.replace(/\/$/,"");
-  if(!url) throw new Error("请在中转设置里填写「中转地址」（如 https://你的域名/generate）。");
-  const model=s.model||"";
-  if(!model) throw new Error("中转模式也需要填写「模型名」（在服务端 provider 上有效的模型，如 deepseek-chat）。");
-  const provider=s.relayProvider||"zhipu";
-  const body={provider, model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.7};
-  if(s.relayToken) body.token=s.relayToken;
-  let res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-  if(!res.ok){ const t=await res.text().catch(()=> ""); throw new Error("中转返回 "+res.status+"："+t.slice(0,200)); }
-  const j=await res.json();
-  const txt=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-  if(!txt) throw new Error("中转未返回内容。");
-  return parseJSON(txt);
-}
-// 修补被截断的 JSON：关闭未闭合的字符串与花括号/方括号。
-// 用于 glm-4-flash 等小模型在长输出时偶尔被掐断的场景。
+/* ===== 4. JSON 解析（含自动修复） ===== */
 function repairTruncatedJSON(s){
   let inStr=false, esc=false;
   const stack=[];
@@ -603,285 +358,287 @@ function repairTruncatedJSON(s){
 }
 function parseJSON(txt){
   let t=txt.trim();
-  // 1) 去除 ```json ... ``` 代码块围栏
   t=t.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
-  // 2) 直接解析
   try{ return JSON.parse(t); }catch(_){}
-  // 3) 抽取最大的 {...} 块
   const m=t.match(/\{[\s\S]*\}/);
   if(m){
     try{ return JSON.parse(m[0]); }catch(_){}
-    // 4) 尝试修补截断
     try{ return JSON.parse(repairTruncatedJSON(m[0])); }catch(_){}
   }
-  // 5) 全文修补后再试一次
   try{ return JSON.parse(repairTruncatedJSON(t)); }catch(_){}
-  throw new Error("模型返回的不是合法 JSON，请重试。原始内容："+t.slice(0,120));
+  throw new Error("模型返回的不是合法 JSON。原始内容（前 200 字）："+t.slice(0,200));
 }
 
-/* ============ 主流程 ============ */
-function buildShell(){
-  const wrap=$("#stages"); wrap.innerHTML="";
-  STAGES.forEach((s,i)=>{ const el=document.createElement("div"); el.className="stage"; el.id="stage-"+i;
-    el.innerHTML=`<span class="num">${s.num}</span><span class="tag ${s.tag}">${s.method}</span><h3>${s.desc}</h3><button class="speak" data-speak="${i}">🔊 朗读</button><div id="body-${i}" class="loading"><span class="spinner"></span>准备中…</div>`;
-    wrap.appendChild(el);
-    el.querySelector('.speak').onclick=()=>speakStage(i);
-  });
-}
-let speakingStage=null;
-function updateSpeakBtns(){ document.querySelectorAll('.speak').forEach(b=>{ const i=+b.getAttribute('data-speak'); if(i===speakingStage){ b.classList.add('on'); b.textContent='⏹ 停止'; } else { b.classList.remove('on'); b.textContent='🔊 朗读'; } }); }
-function speakStage(i){
-  const el=$("#body-"+i); if(!el) return;
-  if(!('speechSynthesis' in window)){ $("#status").innerHTML='<div class="err">当前浏览器不支持朗读，请用 Chrome / Edge 打开。</div>'; return; }
-  if(speakingStage===i){ window.speechSynthesis.cancel(); speakingStage=null; updateSpeakBtns(); return; }
-  window.speechSynthesis.cancel();
-  const clone=el.cloneNode(true);
-  clone.querySelectorAll(".copy,.regen,.speak,.copy,.regen").forEach(n=>n.remove());
-  const text=(clone.innerText||"").replace(/\s+/g," ").trim();
-  if(!text){ $("#status").innerHTML='<div class="err">该阶段内容为空，无法朗读。</div>'; return; }
-  const u=new SpeechSynthesisUtterance(text); u.lang="zh-CN"; u.rate=1; u.pitch=1;
-  u.onend=()=>{ if(speakingStage===i){ speakingStage=null; updateSpeakBtns(); } };
-  u.onerror=()=>{ if(speakingStage===i){ speakingStage=null; updateSpeakBtns(); } };
-  window.speechSynthesis.speak(u); speakingStage=i; updateSpeakBtns();
-}
-function setProgress(doneIdx){ document.querySelectorAll("#progress .chip").forEach((c,i)=>{ c.className="chip"+(i<doneIdx?" done":(i===doneIdx?" active":"")); }); }
-function litStage(i){ const el=$("#stage-"+i); if(el) el.classList.add("lit"); }
-function summarize(plan){ const p=[]; if(plan.anchor)p.push("核心概念："+(plan.anchor.mvp20||[]).join("、")); if(plan.input)p.push("类比与二八已生成"); if(plan.storm)p.push("多视角大纲已生成"); if(plan.feynman)p.push("费曼讲解已生成"); if(plan.system)p.push("项目与自测已生成"); return p.join("；"); }
-async function generateWrapped(){
-  const domain=$("#domain").value.trim();
-  if(!domain){ $("#status").innerHTML=`<div class="err">请先填写学习领域。</div>`; return; }
-  const goal=$("#goal").value.trim(), level=$("#level").value;
+/* ===== 5. API 调用（带 1 次重试） ===== */
+async function callAI(userPrompt){
   const s=getSettings();
-  const providerName={zhipu:"智谱",deepseek:"DeepSeek",qwen:"通义千问",moonshot:"月之暗面",siliconflow:"硅基流动",openai:"OpenAI"}[s.relayProvider||"zhipu"] || (s.relayOn?"中转":"直连");
-  $("#status").innerHTML=`<div class="note">正在为「${esc(domain)}」生成专属学习计划（${providerName} · 先确定 20% 核心，再并行生成其余 4 步）…</div>`;
-  buildShell(); setProgress(0);
-  const plan={domain,goal,level}; currentPlan=plan;
-  // 第 1 阶段：anchor 单独跑（其他 4 个都依赖它的核心概念）
-  litStage(0); setProgress(0);
-  try{
-    const anchorData=await callAPI(PROMPTS.anchor(domain,goal,level));
-    plan.anchor=anchorData; $("#body-0").innerHTML=RENDER.anchor(anchorData); $("#body-0").classList.remove("loading");
-    setProgress(1);
-  }catch(e){
-    $("#body-0").innerHTML=`<div class="err">第 1 步生成失败：${esc(e.message)}<br>由于其余 4 步都依赖核心概念，第 1 步是必需的。请检查服务商/Key/网络后重试。</div>`;
-    $("#body-0").classList.remove("loading");
-    $("#status").innerHTML=`<div class="err">第 1 步失败，已停止。请点击该阶段标题右侧「↻ 重新生成此步」重试，或切换服务商再试。</div>`;
-    setProgress(0); bindCopies(); bindRegen(plan);
-    return;
+  if(s.relayOn && s.relayUrl){
+    return await callRelayWithRetry(userPrompt, s);
   }
-  // 第 2~5 阶段：4 个并行（它们都用同样的 anchor 上下文，互不依赖）
-  const remaining=[{key:"input",i:1},{key:"storm",i:2},{key:"feynman",i:3},{key:"system",i:4}];
-  remaining.forEach(r=>litStage(r.i));
-  const tasks = remaining.map(r=>{
-    const userP = PROMPTS[r.key](domain, summarize(plan));
-    return (async()=>{
-      try{
-        const data=await callAPI(userP);
-        plan[r.key]=data;
-        $("#body-"+r.i).innerHTML=RENDER[r.key](data);
-        $("#body-"+r.i).classList.remove("loading");
-      }catch(e){
-        $("#body-"+r.i).innerHTML=`<div class="err">第 ${r.i+1} 步生成失败：${esc(e.message)}<br>其他阶段不受影响，可点本阶段「↻ 重新生成此步」单独重试。</div>`;
-        $("#body-"+r.i).classList.remove("loading");
-      }
-      const doneCount = Object.keys(plan).filter(k=>plan[k]).length - 1; // 排除 meta 字段
-      setProgress(doneCount);
-      return r.key;
-    })();
-  });
-  await Promise.allSettled(tasks);
-  bindCopies(); bindRegen(plan);
-  // 历史/提示：只在 5 个都成功时才自动保存
-  const allOk = plan.input && plan.storm && plan.feynman && plan.system;
-  if(allOk){
-    pushHistory(domain, plan);
-    $("#status").innerHTML=`<div class="note">✅ 「${esc(domain)}」学习计划已全部生成并保存（${providerName}），已为你排好 1/3/7/16/30 天复习提醒。</div>`;
-  } else {
-    const failed=[];
-    if(!plan.input)failed.push("2"); if(!plan.storm)failed.push("3"); if(!plan.feynman)failed.push("4"); if(!plan.system)failed.push("5");
-    pushHistory(domain, plan); // 部分保存也行
-    $("#status").innerHTML=`<div class="note">⚠️ 「${esc(domain)}」计划已部分保存（缺失第 ${failed.join("、")} 步）。失败阶段点↻重新生成即可。</div>`;
-  }
-  updateBanner();
+  if(!s.base||!s.key||!s.model) throw new Error("请先在 ⚙ 设置 中填写 API Key、Base URL 和模型名，或启用「中转模式」。");
+  return await callDirectWithRetry(userPrompt, s);
 }
-// 测速：同时探查所有可选服务商（中转模式下）
-async function probeProviders(){
-  const s=getSettings();
-  if(!s.relayOn){ $("#probeResult").textContent="请先开启「中转模式」"; return; }
-  const url=s.relayUrl.replace(/\/$/,"")+"/providers";
-  $("#probeResult").textContent="查询中…";
-  try{
-    const r=await fetch(url,{method:"GET",headers:{"Content-Type":"application/json"}});
-    if(!r.ok){ $("#probeResult").textContent="中转不可达："+r.status; return; }
-    const info=await r.json();
-    const providers=info.providers||[];
-    if(!providers.length){ $("#probeResult").textContent="中转未配置任何服务商"; return; }
-    $("#probeResult").textContent="正在测速 "+providers.length+" 个服务商…";
-    const results = await Promise.allSettled(providers.map(async p=>{
-      const t0=Date.now();
-      const pr=await fetch(s.relayUrl.replace(/\/$/,"")+"/probe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({provider:p, token:s.relayToken})});
-      const j=await pr.json();
-      return {provider:p, ok:!!j.ok, latencyMs:j.latencyMs||(Date.now()-t0), error:j.error};
-    }));
-    results.sort((a,b)=> (a.value&&b.value? (a.value.latencyMs-b.value.latencyMs) : (a.value?-1:1)));
-    const tags=results.map(x=>{
-      if(x.status!=="fulfilled") return `<span style="color:#c00">未知错误</span>`;
-      const v=x.value;
-      const color=v.ok?"#0a7":"#c00";
-      const speed=v.ok?(v.latencyMs<1500?"⚡":v.latencyMs<3000?"⏱":"🐢"):"";
-      return `<span style="color:${color};margin-right:10px" data-p="${v.provider}" class="probe-tag" style="cursor:pointer">${v.provider} ${speed} ${v.ok?v.latencyMs+"ms":"失败"}</span>`;
-    }).join("·");
-    $("#probeResult").innerHTML=tags + ` <span style="font-size:11px;color:var(--muted)">（点名称可一键切换）</span>`;
-    // 点击测速结果切换服务商
-    document.querySelectorAll(".probe-tag").forEach(el=>{
-      el.onclick=()=>{ const p=el.getAttribute("data-p"); $("#relayProvider").value=p; syncModelFromProvider(p); saveSettings(); $("#probeResult").innerHTML=`<span style="color:#0a7">已切换到 ${p}，并把模型名同步成默认值。</span>`; };
+async function callDirectWithRetry(userPrompt, s){
+  const target=s.base.replace(/\/$/,"")+"/chat/completions";
+  const url = s.proxyOn ? (s.proxyUrl.replace(/\/$/,"")+"/?url="+encodeURIComponent(target)) : target;
+  for(let attempt=0; attempt<2; attempt++){
+    const body={model:s.model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.6};
+    if(attempt===1) body.messages[1].content += "\n\n【重申】只返回完整 JSON，禁止任何解释文字，禁止代码块围栏，禁止截断！";
+    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.key},body:JSON.stringify(body)});
+    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error("API "+res.status+"："+t.slice(0,180)); }
+    const j=await res.json();
+    const txt=j.choices?.[0]?.message?.content;
+    if(!txt) throw new Error("API 未返回内容");
+    try{ return parseJSON(txt); }
+    catch(e){
+      if(attempt===0){ console.warn("JSON parse fail, retrying...", e.message); continue; }
+      throw e;
+    }
+  }
+}
+async function callRelayWithRetry(userPrompt, s){
+  for(let attempt=0; attempt<2; attempt++){
+    const body={provider:s.provider, model:s.model, messages:[{role:"system",content:SYS},{role:"user",content:userPrompt}], temperature:0.6};
+    if(attempt===1) body.messages[1].content += "\n\n【重申】只返回完整 JSON，禁止任何解释文字，禁止代码块围栏，禁止截断！";
+    if(s.relayToken) body.token=s.relayToken;
+    const res=await fetch(s.relayUrl.replace(/\/$/,""),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error("中转 "+res.status+"："+t.slice(0,180)); }
+    const j=await res.json();
+    const txt=j.choices?.[0]?.message?.content;
+    if(!txt) throw new Error("中转未返回内容");
+    try{ return parseJSON(txt); }
+    catch(e){
+      if(attempt===0){ console.warn("JSON parse fail, retrying via relay...", e.message); continue; }
+      throw e;
+    }
+  }
+}
+
+/* ===== 6. 渲染 ===== */
+function esc(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]); }
+
+function renderPlan(data){
+  const r=$("#result");
+  r.innerHTML="";
+
+  // hero
+  const hero=document.createElement("div");
+  hero.className="card hero";
+  hero.innerHTML=`
+    <h2>${esc(data.title||"")}</h2>
+    <p class="oneliner">${esc(data.oneLiner||"")}</p>
+    <div class="meta-bar">
+      <span class="tag c1">核心 ${data.core20?.length||0} 个</span>
+      <span class="tag c2">课程 ${data.lessons?.length||0} 节</span>
+      <span class="tag c3">项目 ${esc(data.capstone?.duration||"X")}天</span>
+    </div>
+    <div class="row-act">
+      <button class="copy-btn" id="copyMd">📋 复制为 Markdown</button>
+    </div>
+  `;
+  r.appendChild(hero);
+
+  // 1) 核心 20%
+  const c1=document.createElement("div");
+  c1.className="card";
+  c1.innerHTML=`<h2><span class="tag c1">20% 核心</span> 必须掌握的概念与技能</h2>
+    <p style="margin:0 0 10px;color:var(--muted);font-size:13px">按重要性排序；掌握前 5 个就入门，掌握全部 7~8 个就超越多数自学者的水平。</p>
+    <div class="concepts">${(data.core20||[]).map(c=>`
+      <div class="concept">
+        <div class="name"><span>${esc(c.name||"")}</span><span class="pct">${c.weight||0}%</span></div>
+        <p class="why">${esc(c.why||"")}</p>
+        <p class="pitfall">⚠ ${esc(c.pitfall||"")}</p>
+      </div>`).join("")}</div>`;
+  r.appendChild(c1);
+
+  // 2) 课程计划
+  const c2=document.createElement("div");
+  c2.className="card";
+  c2.innerHTML=`<h2><span class="tag c2">课程计划</span> 5~7 节，从入门到能做项目</h2>
+    <div class="lessons">${(data.lessons||[]).map(L=>`
+      <details class="lesson" ${L.n===1?"open":""}>
+        <summary>${esc(L.title||"第"+L.n+"课")} <span class="badge">${(L.concepts||[]).length} 概念</span></summary>
+        <div class="lesson-body">
+          <div class="row"><b>学习目标</b>${esc(L.goal||"")}</div>
+          <div class="row"><b>涉及概念</b>${(L.concepts||[]).map(x=>`<span class="res">${esc(x)}</span>`).join("")}</div>
+          <div class="row"><b>练习内容</b><ul>${(L.exercises||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+          <div class="row"><b>参考资源</b>${(L.resources||[]).map(x=>`<span class="res"><span class="t">${esc(x.type||"")}</span>${esc(x.name||"")}</span>`).join("")||'<span style="color:var(--muted)">无</span>'}</div>
+          <div class="row"><b>复习题</b><ul class="review-list">${(L.review||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+        </div>
+      </details>`).join("")}</div>`;
+  r.appendChild(c2);
+
+  // 3) 实战项目
+  if(data.capstone){
+    const P=data.capstone;
+    const c3=document.createElement("div");
+    c3.className="card";
+    const msHTML=(P.milestones||[]).map(m=>`
+      <label class="ms">
+        <input type="checkbox" data-domain="${esc(data.title)}" data-day="${m.day}" data-task="${esc(m.task)}">
+        <div>
+          <div class="t">${esc(m.task||"")}</div>
+          <span class="c">📌 验收：${esc(m.check||"")}</span>
+        </div>
+      </label>`).join("");
+    const fcHTML=(P.finalCheck||[]).map(x=>`
+      <label><input type="checkbox" data-domain="${esc(data.title)}" data-final="${esc(x)}"> ${esc(x)}</label>`).join("");
+    c3.innerHTML=`
+      <h2><span class="tag c3">实战项目</span> ${esc(P.title||"")}</h2>
+      <p class="sub">周期：${esc(P.duration||"")}　|　完成后能证明：你不是"看了"，而是"会了"</p>
+      <div class="deliv">📦 最终交付物：${esc(P.deliverable||"")}</div>
+      <h4 style="margin:14px 0 4px;font-size:13px;color:var(--c3)">📅 里程碑（勾选 = 当天完成）</h4>
+      <div class="milestones">${msHTML}</div>
+      <div class="checks">
+        <h4>✅ 最终验收标准（全部勾上 = 项目真正完成）</h4>
+        ${fcHTML}
+      </div>`;
+    r.appendChild(c3);
+  }
+
+  // 绑定 markdown 复制 & 勾选状态持久化
+  $("#copyMd")?.addEventListener("click", ()=>copyAsMarkdown(data));
+  document.querySelectorAll('input[type=checkbox][data-domain]').forEach(cb=>{
+    const key="aiLearn.v2.check."+cb.dataset.domain+"."+(cb.dataset.day?"day"+cb.dataset.day:"final")+"."+(cb.dataset.day?cb.dataset.task:cb.dataset.final);
+    cb.checked = localStorage.getItem(key)==="1";
+    cb.addEventListener("change", ()=>{
+      localStorage.setItem(key, cb.checked?"1":"0");
     });
-  }catch(e){ $("#probeResult").textContent="失败："+e.message; }
-}
-function bindCopies(){ document.querySelectorAll(".copy").forEach(b=>{ if(b._b)return; b._b=1; b.onclick=()=>{ copyText(b.getAttribute("data-copy")); const o=b.textContent; b.textContent="已复制"; setTimeout(()=>b.textContent=o,1200); }; }); }
-function bindRegen(plan){
-  STAGES.forEach((s,i)=>{ const regen=document.createElement("span"); regen.className="regen"; regen.textContent="↻ 重新生成此步";
-    regen.onclick=async()=>{ const key=s.key; const ctx=summarize(plan);
-      const userP = key==="anchor" ? PROMPTS.anchor(plan.domain,plan.goal,plan.level) : PROMPTS[key](plan.domain,ctx);
-      $("#body-"+i).innerHTML=`<div class="loading"><span class="spinner"></span>重新生成中…</div>`;
-      try{ const data=await callAPI(userP); plan[key]=data; $("#body-"+i).innerHTML=RENDER[key](data); bindCopies(); pushHistory(plan.domain,plan); }
-      catch(e){ $("#body-"+i).innerHTML=`<div class="err">重试失败：${esc(e.message)}</div>`; } };
-    const h3=$("#stage-"+i).querySelector("h3"); if(h3 && !h3.querySelector(".regen")) h3.appendChild(regen);
-  }); bindCopies();
-}
-function templateMode(){
-  const domain=$("#domain").value.trim()||"[领域]"; const goal=$("#goal").value.trim(), level=$("#level").value;
-  $("#status").innerHTML=`<div class="note">未检测到 API Key，已切换为「模板模式」：下方是已填入「${esc(domain)}」的提示词，复制后发给你的 AI 即可获得同样内容。</div>`;
-  buildShell(); setProgress(5);
-  STAGES.forEach((s,i)=>{ litStage(i); const ctx=i===0?"":`（基于前面确定的该领域核心概念）`; const p=i===0?PROMPTS.anchor(domain,goal,level):PROMPTS[s.key](domain,ctx);
-    $("#body-"+i).classList.remove("loading"); $("#body-"+i).innerHTML=block("发给 AI 的提示词（复制后粘贴到任意大模型）", p, p); });
-  bindCopies();
-}
-function demo(){
-  const plan={domain:"机器学习",goal:"转行做数据分析",level:"零基础",
-    anchor:{ oneLiner:"机器学习就像教小孩认猫——你不直接写规则，而是给它看成千上万张猫的照片，让它自己总结出'猫长什么样'的判断力。",
-      roadmap:[
-        {level:1,name:"入门",mustKnow:["什么是机器学习","监督/无监督学习","训练集与测试集","过拟合"],resources:["吴恩达《机器学习》公开课（前3周）","《图解机器学习》"]},
-        {level:2,name:"进阶",mustKnow:["线性回归/逻辑回归","决策树与随机森林","特征工程","模型评估指标"],resources:["Kaggle 入门竞赛（Titanic）","《Hands-On ML》第1-3章"]},
-        {level:3,name:"精通",mustKnow:["神经网络与反向传播","正则化与调参","集成方法","Pipeline 工程化"],resources:["《深度学习》花书选读","真实业务数据集端到端项目"]} ],
-      mvp20:["监督 vs 无监督","训练/验证/测试集","过拟合与泛化","特征与标签","损失函数","准确率/精确率/召回率","线性回归","决策树","特征工程","交叉验证"] },
-    input:{ analogies:["教小孩认猫","菜谱","天气预报","垃圾分类","身高估体重","考试刷题","导航路线","医院诊断","推荐外卖","翻译器"],
-      threeLayer:[
-        {layer:"表层直觉",explain:"让程序从数据里自己找规律，而不是人把规律写死。",example:"给邮件标好'垃圾/正常'，模型学会自动分类新邮件。"},
-        {layer:"中层机制",explain:"用'损失函数'衡量预测偏差，不断调整内部参数让偏差变小。",example:"预测房价偏了10万，就调参数让它下次更准。"},
-        {layer:"深层原理",explain:"本质是函数在高维空间里拟合输入到输出的映射，训练即最优化。",example:"梯度下降沿误差山坡往下走，找到最低点对应最优参数。"} ],
-      pareto:["搞懂'训练/验证/测试集'与'过拟合'能避免80%新手错误","掌握线性回归+逻辑回归覆盖大量表格预测任务","会做特征工程比换复杂模型更提分","理解准确率/精确率/召回率才看得懂模型好坏","交叉验证让评估结果更可信"] },
-    storm:{ expertQuestions:[
-        {role:"实践者",questions:["业务里哪些问题其实用不到 ML？","数据脏乱时第一步做什么？","上线后模型衰退怎么办？"]},
-        {role:"理论家",questions:["偏差-方差权衡如何量化？","为什么深度网络能拟合任意函数？","损失函数选择的理论依据？"]},
-        {role:"批评者",questions:["ML 被滥用的典型场景？","相关性≠因果，哪些结论会误导？","小样本下模型可信吗？"]},
-        {role:"跨界者",questions:["和统计学预测有何本质区别？","和生物进化/大脑学习像在哪？","和传统规则系统如何共存？"]},
-        {role:"初学者",questions:["为什么叫'机器'学习？","要先会编程还是先懂数学？","第一周能做出什么东西？"]} ],
-      outline:"# 机器学习\n## 1. 基础概念\n- 定义：从数据自动归纳规律\n## 2. 核心流程\n- 数据 → 特征 → 模型 → 评估 → 迭代\n## 3. 经典算法\n- 线性模型 → 树模型 → 集成 → 神经网络",
-      devilsAdvocate:["'入门必学神经网络'是偏见","示例把 ML 说得过于自动，实际 80% 精力在数据与特征","未提及数据隐私与合规风险"] },
-    feynman:{ simplified:"想象你有一大筐标好答案的练习题（数据）。你不直接背答案，而是反复看题、猜、对照正确答案、修正思路，直到能答对新题。机器学习就是让电脑用这套'刷题找套路'的方式，从例子里总结规律。关键不是人写规则，而是让电脑从数据里'悟'出来。",
-      checklist:["容易把'训练'说成'编程'","容易忽略'测试集'的作用","容易混淆'相关'与'因果'","过拟合常被说成'学太好'，其实是死记硬背"],
-      elevator:"机器学习是让电脑从大量带答案的例子中自己总结规律，从而对新情况做出预测，而不是由人把规则一条条写死。" },
-    system:{ conceptMap:"# 机器学习概念地图\n## 已掌握\n- 监督/无监督区别\n## 待巩固\n- 偏差-方差权衡\n## 进阶\n- 神经网络反向传播",
-      project:"用 Titanic 数据集做一个'乘客生还预测'：清洗数据→做特征→用逻辑回归和随机森林各训一个模型→比较准确率。2 小时内可完成。",
-      reviewQs:["题1：说明如何划分训练/验证/测试集并解释为何不能全用来训练。","题2：训练集99%准、测试集60%准说明什么？给两种解决办法。","题3：预测房价应换用哪类算法与评估指标？"] }
-  };
-  currentPlan=plan;
-  $("#status").innerHTML=`<div class="note">已载入「机器学习」示例（内置，无需 API）。配置 API 后即可生成你自己的计划。</div>`;
-  buildShell(); setProgress(5);
-  STAGES.forEach((s,i)=>{ litStage(i); $("#body-"+i).classList.remove("loading"); $("#body-"+i).innerHTML=RENDER[s.key](plan[s.key]); });
-  bindCopies();
-}
-function showPlan(domain, plan){ $("#domain").value=domain; currentPlan=plan;
-  $("#status").innerHTML=`<div class="note">已载入历史计划「${esc(domain)}」。</div>`;
-  buildShell(); setProgress(5);
-  STAGES.forEach((s,i)=>{ litStage(i); $("#body-"+i).classList.remove("loading"); $("#body-"+i).innerHTML=RENDER[s.key](plan[s.key]); });
-  bindCopies(); window.scrollTo({top:0,behavior:"smooth"});
+  });
 }
 
-/* ============ 导出 ============ */
-function buildMarkdown(){
-  const plan=currentPlan; if(!plan){ $("#status").innerHTML=`<div class="err">请先生成或载入一个学习计划再导出。</div>`; return null; }
-  let md=`# 学习路径：${plan.domain}\n\n> 目标：${plan.goal||"-"} · 水平：${plan.level||"-"}\n\n`;
-  if(plan.anchor){ md+=`## 阶段1 · 元学习定锚\n\n- 一句话：${plan.anchor.oneLiner||""}\n\n### 分层路线图\n`;
-    (plan.anchor.roadmap||[]).forEach(lv=>{ md+=`**第${lv.level}层 · ${lv.name}**\n- 必掌握：${(lv.mustKnow||[]).join("、")}\n- 资源：${(lv.resources||[]).join("；")}\n\n`; });
-    md+=`### 20% 核心概念\n${(plan.anchor.mvp20||[]).map(x=>"- "+x).join("\n")}\n\n`; }
-  if(plan.input){ md+=`## 阶段2 · 高效输入\n\n### 10 个生活类比\n${(plan.input.analogies||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}\n\n### 三层拆解\n`;
-    (plan.input.threeLayer||[]).forEach(t=>{ md+=`- **${t.layer}**：${t.explain}（例：${t.example}）\n`; });
-    md+=`\n### 二八清单\n${(plan.input.pareto||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}\n\n`; }
-  if(plan.storm){ md+=`## 阶段3 · 多视角建构\n\n### 专家圆桌\n`;
-    (plan.storm.expertQuestions||[]).forEach(e=>{ md+=`**${e.role}**\n${(e.questions||[]).map(q=>"- "+q).join("\n")}\n`; });
-    md+=`\n### 知识大纲\n${plan.storm.outline||""}\n\n### 魔鬼代言人挑错\n${(plan.storm.devilsAdvocate||[]).map((x,i)=>`${i+1}. ${x}`).join("\n")}\n\n`; }
-  if(plan.feynman){ md+=`## 阶段4 · 费曼输出\n\n- 通俗讲解：${plan.feynman.simplified||""}\n- 易错点：${(plan.feynman.checklist||[]).join("；")}\n- 电梯演讲：${plan.feynman.elevator||""}\n\n`; }
-  if(plan.system){ md+=`## 阶段5 · 系统化·应用\n\n### 概念地图\n${plan.system.conceptMap||""}\n\n### 最小可行项目\n${plan.system.project||""}\n\n### 自测题\n${(plan.system.reviewQs||[]).map((x,i)=>`${i+1}. ${x}`).join("\n\n")}\n`; }
+/* ===== 7. 导出 Markdown ===== */
+function toMarkdown(data){
+  let md=`# ${data.title||""}\n\n> ${data.oneLiner||""}\n\n`;
+  md+=`## 🎯 20% 核心概念\n\n`;
+  (data.core20||[]).forEach(c=>{
+    md+=`- **${c.name}**（${c.weight}%）—— ${c.why}  ⚠ ${c.pitfall}\n`;
+  });
+  md+=`\n## 📚 课程计划\n\n`;
+  (data.lessons||[]).forEach(L=>{
+    md+=`### ${L.title}\n- **学习目标**：${L.goal}\n- **涉及概念**：${(L.concepts||[]).join("、")}\n`;
+    md+=`- **练习内容**：\n${(L.exercises||[]).map(x=>"  - "+x).join("\n")}\n`;
+    md+=`- **参考资源**：${(L.resources||[]).map(x=>`\`${x.type}\` ${x.name}`).join("；")}\n`;
+    md+=`- **复习题**：\n${(L.review||[]).map(x=>"  - "+x).join("\n")}\n\n`;
+  });
+  if(data.capstone){
+    const P=data.capstone;
+    md+=`## 🚀 实战项目：${P.title}\n\n**周期**：${P.duration}\n\n**交付物**：${P.deliverable}\n\n### 里程碑\n`;
+    (P.milestones||[]).forEach(m=>md+=`- [ ] **第 ${m.day} 天**：${m.task}　📌 ${m.check}\n`);
+    md+=`\n### 最终验收\n`;
+    (P.finalCheck||[]).forEach(x=>md+=`- [ ] ${x}\n`);
+  }
   return md;
 }
-function exportMarkdown(){ const md=buildMarkdown(); if(!md) return;
-  const blob=new Blob([md],{type:"text/markdown;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
-  a.download=(currentPlan.domain||"学习计划")+".md"; a.click(); $("#status").innerHTML=`<div class="note">已导出 Markdown 笔记。</div>`; }
-function exportPdf(){ if(!currentPlan){ $("#status").innerHTML=`<div class="err">请先生成或载入计划再导出。</div>`; return; }
-  $("#status").innerHTML=`<div class="note">正在打开打印窗口，选择「另存为 PDF」即可。</div>`; setTimeout(()=>window.print(),300); }
-function cardHTML(domain, r, mvp, elev, q){
-  return `<div class="card-flash"><h4>${esc(domain)} · 第 ${r.offset} 天复习</h4>
-    <div class="front"><div class="lbl">正面 · 凭记忆回答</div>① 写出 3 个核心概念<br>② 用一句话做电梯演讲<br>③ 描述一个最小可行项目思路</div>
-    <div class="back"><div class="lbl">背面 · 参考答案</div>核心概念：${esc(mvp)}<br>电梯演讲：${esc(elev)}<br>自测：${esc(q)}</div></div>`;
+function copyAsMarkdown(data){
+  const md=toMarkdown(data);
+  navigator.clipboard?.writeText(md).then(()=>flash("ok","📋 Markdown 已复制到剪贴板")).catch(()=>{
+    // fallback
+    const ta=document.createElement("textarea"); ta.value=md; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta); flash("ok","📋 已复制");
+  });
 }
-function collectCards(){
-  const cards=[]; loadHistory().forEach(it=>{ ensureReviews(it); it.reviews.forEach(r=>{ if(!r.done){
-    const p=it.plan; const mvp=(p.anchor&&p.anchor.mvp20||[]).join("、"); const elev=(p.feynman&&p.feynman.elevator)||""; const q=(p.system&&p.system.reviewQs&&p.system.reviewQs[0])||"参考阶段5自测题";
-    cards.push(cardHTML(it.domain,r,mvp,elev,q));
-  }});}); return cards;
+function downloadMd(data){
+  const md=toMarkdown(data);
+  const blob=new Blob([md],{type:"text/markdown;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=(data.title||"学习手册")+".md";
+  a.click(); URL.revokeObjectURL(a.href);
 }
-function exportCardsPrint(){ const cards=collectCards(); if(!cards.length){ $("#status").innerHTML=`<div class="note">没有待复习卡片（都已复习完或尚未生成计划）。</div>`; return; }
-  $("#printCards").innerHTML='<h2 style="font-family:sans-serif">复习卡片</h2>'+cards.join("");
-  $("#status").innerHTML=`<div class="note">正在打开打印窗口，选择「另存为 PDF」即可导出复习卡片。</div>`; setTimeout(()=>window.print(),300); }
-function exportCardsMd(){ const cards=collectCards(); if(!cards.length){ $("#status").innerHTML=`<div class="note">没有待复习卡片。</div>`; return; }
-  let md="# 复习卡片\n\n"; loadHistory().forEach(it=>{ ensureReviews(it); it.reviews.forEach(r=>{ if(!r.done){
-    const p=it.plan; const mvp=(p.anchor&&p.anchor.mvp20||[]).join("、"); const elev=(p.feynman&&p.feynman.elevator)||""; const q=(p.system&&p.system.reviewQs&&p.system.reviewQs[0])||"";
-    md+=`## ${it.domain} · 第 ${r.offset} 天\n- 正面：写出3个核心概念 / 电梯演讲 / 最小项目思路\n- 背面：核心概念 ${mvp}；电梯演讲 ${elev}；自测 ${q}\n\n`;
-  }});});
-  const blob=new Blob([md],{type:"text/markdown;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="复习卡片.md"; a.click();
-  $("#status").innerHTML=`<div class="note">已导出复习卡片 Markdown。</div>`; }
-function exportBackup(){ const data={v:1,settings:getSettings(),history:loadHistory()};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="ai-learn-backup.json"; a.click(); }
-function importBackup(file){ const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result);
-  if(d.settings) localStorage.setItem("aiLearn.settings",JSON.stringify(d.settings));
-  if(d.history) localStorage.setItem("aiLearn.history",JSON.stringify(d.history));
-  loadSettings(); renderHistory(); renderReviewPanel(); updateBanner();
-  $("#status").innerHTML=`<div class="note">已从备份恢复设置与计划。</div>`;
-  }catch(e){ $("#status").innerHTML=`<div class="err">备份文件无法解析。</div>`; } }; r.readAsText(file); }
 
-/* ============ 复习横幅 ============ */
-function updateBanner(){ const n=dueCount(); const b=$("#reviewBanner");
-  if(n>0){ b.className="banner show"; b.innerHTML=`🔔 今天有 <b>${n}</b> 个学习计划该复习了，点上方「🔔 复习日历」开始间隔复习。`; }
-  else { b.className="banner"; b.innerHTML=""; } }
+/* ===== 8. 历史 ===== */
+const HISTORY_KEY="aiLearn.v2.history";
+function loadHistory(){ try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||[]}catch{return[]} }
+function saveHistory(arr){ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }
+function pushHistory(domain, data){
+  const arr=loadHistory();
+  const i=arr.findIndex(x=>x.domain===domain);
+  const item={domain, data, createdAt:Date.now()};
+  if(i>=0) arr[i]=item; else arr.push(item);
+  if(arr.length>20) arr=arr.slice(-20);
+  saveHistory(arr);
+  renderHistory();
+}
+function renderHistory(){
+  const list=loadHistory().slice().reverse();
+  const card=$("#histCard"); const w=$("#hist");
+  if(!list.length){ card.style.display="none"; return; }
+  card.style.display="";
+  w.innerHTML=list.map(it=>{
+    const d=new Date(it.createdAt);
+    const dateStr=`${d.getMonth()+1}/${d.getDate()}`;
+    return `<span class="hist-item" data-domain="${esc(it.domain)}">
+      <span>${esc(it.domain)}</span>
+      <span style="color:var(--muted);font-size:11px">${dateStr}</span>
+    </span>`;
+  }).join("");
+  w.querySelectorAll(".hist-item").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const item=loadHistory().find(x=>x.domain===el.dataset.domain);
+      if(item){ renderPlan(item.data); window.scrollTo({top:0,behavior:"smooth"}); }
+    });
+  });
+}
 
-/* ============ 事件 ============ */
-let calY=null, calM=null;
-$("#gear").onclick=()=>{ $("#settings").classList.toggle("show"); if($("#settings").classList.contains("show")&&getSettings().proxyOn) checkProxy(); };
-$("#preset").onchange=applyPreset;
-$("#proxyOn").onchange=()=>{ if($("#proxyOn").checked) checkProxy(); };
-$("#saveSet").onclick=saveSettings;
-$("#clearSet").onclick=()=>{ localStorage.removeItem("aiLearn.settings"); $("#base").value="";$("#key").value="";$("#model").value=""; $("#relayUrl").value="";$("#relayToken").value=""; $("#relayProvider").value=DEFAULT_RELAY_PROVIDER; $("#status").innerHTML=`<div class="note">已清除本地 API 设置。</div>`; };
-$("#gen").onclick=()=>{ const s=getSettings(); if(!s.key && !s.relayOn){ templateMode(); } else { generateWrapped(); } };
-$("#demo").onclick=demo;
-$("#showHist").onclick=()=>{ const c=$("#histCard"); c.classList.toggle("hidden"); if(!c.classList.contains("hidden")) renderHistory(); };
-$("#showReview").onclick=()=>{ const c=$("#reviewCard"); c.classList.toggle("hidden"); if(!c.classList.contains("hidden")) renderReviewPanel(); };
-$("#expMd").onclick=exportMarkdown;
-$("#expPdf").onclick=exportPdf;
-$("#expCardsPdf").onclick=exportCardsPrint;
-$("#expCardsMd").onclick=exportCardsMd;
-$("#expBackup").onclick=exportBackup;
-$("#impBackup").onclick=()=>$("#importFile").click();
-$("#importFile").onchange=(e)=>{ if(e.target.files[0]) importBackup(e.target.files[0]); e.target.value=""; };
-$("#showProxy").onclick=()=>{ const b=$("#proxyBox"); b.classList.toggle("hidden"); if(!b.classList.contains("hidden")) $("#proxyCode").textContent=PROXY_SCRIPT; };
-$("#showRelay").onclick=()=>{ const b=$("#relayBox"); b.classList.toggle("hidden"); };
-$("#probeBtn").onclick=probeProviders;
-$("#relayProvider").onchange=(e)=>{ syncModelFromProvider(e.target.value); saveSettings(); };
-$("#calPrev").onclick=()=>{ const d=new Date(calY??new Date().getFullYear(),(calM??new Date().getMonth())-1,1); calY=d.getFullYear(); calM=d.getMonth(); renderCalendar(); };
-$("#calNext").onclick=()=>{ const d=new Date(calY??new Date().getFullYear(),(calM??new Date().getMonth())+1,1); calY=d.getFullYear(); calM=d.getMonth(); renderCalendar(); };
+/* ===== 9. 状态提示 ===== */
+function flash(type, msg, extra){
+  const c={"ok":"ok","err":"err","note":"note"}[type]||"note";
+  let html=`<div class="${c}">${esc(msg)}`;
+  if(extra) html+=`<details><summary>查看错误详情（可点击展开）</summary><pre style="white-space:pre-wrap;font-size:12px;margin:6px 0 0">${esc(extra)}</pre></details>`;
+  html+=`</div>`;
+  $("#status").innerHTML=html;
+}
 
-loadSettings(); renderHistory(); renderReviewPanel(); updateBanner();
+/* ===== 10. 主流程 ===== */
+async function generate(){
+  const domain=$("#domain").value.trim();
+  if(!domain){ flash("err","请先填写学习领域"); return; }
+  const goal=$("#goal").value.trim();
+  const level=$("#level").value;
+  const s=getSettings();
+  if(!s.relayOn && (!s.key||!s.base||!s.model)){ flash("err","请先在 ⚙ 设置 中填 API Key（或启用中转模式）"); document.getElementById("setPanel").open=true; return; }
+
+  const genBtn=$("#gen");
+  genBtn.disabled=true;
+  $("#exportMd").disabled=true;
+  flash("note",`<span class="spinner"></span>正在为「${esc(domain)}」凝练核心、设计课程、规划实战项目…（1 次生成，约 10~25 秒）`);
+
+  try{
+    const data=await callAI(USER_PROMPT({domain, goal, level}));
+    if(!data.core20 || !data.lessons || !data.capstone){
+      throw new Error("模型返回缺少关键字段（core20/lessons/capstone），原始数据："+JSON.stringify(data).slice(0,200));
+    }
+    renderPlan(data);
+    pushHistory(domain, data);
+    $("#exportMd").disabled=false;
+    $("#exportMd").onclick=()=>downloadMd(data);
+    flash("ok","✅ 学习手册已生成。已自动保存到「历史计划」。");
+    window.scrollTo({top:$("#result").offsetTop-20, behavior:"smooth"});
+  }catch(e){
+    flash("err","生成失败："+e.message, e.message);
+  }finally{
+    genBtn.disabled=false;
+  }
+}
+
+/* ===== 11. 事件绑定 ===== */
+document.getElementById("gen").addEventListener("click", generate);
+document.getElementById("openSet").addEventListener("click", ()=>document.getElementById("setPanel").open=true);
+document.getElementById("provider").addEventListener("change", applyPreset);
+document.getElementById("saveSet").addEventListener("click", saveSettings);
+document.getElementById("clearSet").addEventListener("click", ()=>{
+  localStorage.removeItem("aiLearn.v2.settings");
+  $("#base").value=""; $("#key").value=""; $("#model").value=""; $("#relayUrl").value=""; $("#relayToken").value="";
+  flash("note","已清除设置");
+});
+
+/* ===== 12. 初始化 ===== */
+loadSettings();
+renderHistory();
+if(DEFAULT_RELAY){
+  flash("ok","✓ 中转模式已默认启用（Key 在服务器，浏览器无 Key）");
+}
 </script>
 </body>
 </html>
