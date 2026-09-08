@@ -581,9 +581,43 @@ async function callRelay(userPrompt, s){
   if(!txt) throw new Error("中转未返回内容。");
   return parseJSON(txt);
 }
-function parseJSON(txt){ let t=txt.trim(); try{return JSON.parse(t);}catch(e){}
-  const m=t.match(/\{[\s\S]*\}/); if(m){ try{return JSON.parse(m[0]);}catch(e){} }
-  throw new Error("模型返回的不是合法 JSON，请重试。原始内容："+txt.slice(0,120)); }
+// 修补被截断的 JSON：关闭未闭合的字符串与花括号/方括号。
+// 用于 glm-4-flash 等小模型在长输出时偶尔被掐断的场景。
+function repairTruncatedJSON(s){
+  let inStr=false, esc=false;
+  const stack=[];
+  for(let i=0;i<s.length;i++){
+    const c=s[i];
+    if(esc){ esc=false; continue; }
+    if(c==='\\'){ esc=true; continue; }
+    if(c==='"'){ inStr=!inStr; continue; }
+    if(!inStr){
+      if(c==='{') stack.push('}');
+      else if(c==='[') stack.push(']');
+      else if(c==='}'||c===']') stack.pop();
+    }
+  }
+  if(inStr) s += '"';
+  while(stack.length) s += stack.pop();
+  return s;
+}
+function parseJSON(txt){
+  let t=txt.trim();
+  // 1) 去除 ```json ... ``` 代码块围栏
+  t=t.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+  // 2) 直接解析
+  try{ return JSON.parse(t); }catch(_){}
+  // 3) 抽取最大的 {...} 块
+  const m=t.match(/\{[\s\S]*\}/);
+  if(m){
+    try{ return JSON.parse(m[0]); }catch(_){}
+    // 4) 尝试修补截断
+    try{ return JSON.parse(repairTruncatedJSON(m[0])); }catch(_){}
+  }
+  // 5) 全文修补后再试一次
+  try{ return JSON.parse(repairTruncatedJSON(t)); }catch(_){}
+  throw new Error("模型返回的不是合法 JSON，请重试。原始内容："+t.slice(0,120));
+}
 
 /* ============ 主流程 ============ */
 function buildShell(){
